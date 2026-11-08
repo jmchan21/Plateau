@@ -1,0 +1,1057 @@
+<title>Plateau Vent Trainer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Plateau">
+<meta name="description" content="Mechanical ventilation training for ICU clinicians: simulator, cases, questions, and spaced review.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one phone-first app column, sticky header, fixed bottom tab bar. The ventilator monitor is a fixed dark "device" in both themes. */
+:root{
+  --bg:#0d1719; --surface:#132226; --raised:#1a2d32; --line:#253c42; --fg:#e5efed; --muted:#8fa8a6; --faint:#5f7876;
+  --accent:#ffbd45; --on-accent:#1f1500; --accent-soft:rgba(255,189,69,.14);
+  --good:#45d08b; --warn:#ffb020; --crit:#ff5f6b; --good-soft:rgba(69,208,139,.14); --warn-soft:rgba(255,176,32,.14); --crit-soft:rgba(255,95,107,.14);
+  --mon-bg:#071113; --mon-line:#18292d; --mon-fg:#e8f3f1; --mon-muted:#7d9895; --mon-p:#ffc94d; --mon-f:#4fe0a3; --mon-v:#66c9ff;
+  --font-display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --font-body:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-data:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r-lg:18px; --r-md:12px; --r-sm:8px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#edf2f1; --surface:#ffffff; --raised:#f4f8f7; --line:#d3dfdd; --fg:#0f2022; --muted:#4f6765; --faint:#8a9e9c;
+  --accent:#b86f00; --on-accent:#ffffff; --accent-soft:rgba(184,111,0,.10);
+  --good:#108a52; --warn:#a86500; --crit:#cc2f40; --good-soft:rgba(16,138,82,.10); --warn-soft:rgba(168,101,0,.10); --crit-soft:rgba(204,47,64,.09);
+  color-scheme:light; } }
+:root[data-theme="light"]{
+  --bg:#edf2f1; --surface:#ffffff; --raised:#f4f8f7; --line:#d3dfdd; --fg:#0f2022; --muted:#4f6765; --faint:#8a9e9c;
+  --accent:#b86f00; --on-accent:#ffffff; --accent-soft:rgba(184,111,0,.10);
+  --good:#108a52; --warn:#a86500; --crit:#cc2f40; --good-soft:rgba(16,138,82,.10); --warn-soft:rgba(168,101,0,.10); --crit-soft:rgba(204,47,64,.09);
+  color-scheme:light; }
+
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--font-body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.app{max-width:760px;margin:0 auto;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;gap:12px;padding-block:12px 10px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.01em;background:none;border:0;padding:0}
+.brand svg{flex:none}
+.top .spacer{flex:1}
+.lvl{font-family:var(--font-data);font-size:11.5px;color:var(--muted);text-align:right;line-height:1.25}
+.lvl b{color:var(--fg);font-weight:600}
+.iconbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+  padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+.tabbar .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:var(--faint);font-size:11px;font-weight:600;position:relative}
+.tab[aria-current="page"]{color:var(--accent)}
+.tab .badge{position:absolute;top:2px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 5px;border-radius:9px;background:var(--crit);color:#fff;font-size:10.5px;line-height:17px;font-family:var(--font-data)}
+
+/* type */
+.eyebrow{font-family:var(--font-data);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+h1{font-size:30px;line-height:1.1;font-weight:800}
+h2{font-size:21px;line-height:1.2;font-weight:700}
+h3{font-size:17px;line-height:1.3;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.mono{font-family:var(--font-data);font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:26px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.screen{padding-block:20px 8px}
+
+/* surfaces */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-md);padding:12px 16px;font-weight:700;border:1px solid transparent;min-height:46px;text-decoration:none}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--fg)}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-data);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--raised);color:var(--muted)}
+.pill.good{background:var(--good-soft);color:var(--good)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.acc{background:var(--accent-soft);color:var(--accent)}
+
+/* home */
+.hero{display:flex;flex-direction:column;gap:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px}
+.stat .v{font-family:var(--font-display);font-size:26px;font-weight:800;line-height:1.1}
+.stat .k{font-size:12.5px;color:var(--muted)}
+.plan{display:flex;flex-direction:column}
+.plan a{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--line);color:var(--fg);text-decoration:none}
+.plan a:first-of-type{border-top:0}
+.plan .ic{width:42px;height:42px;border-radius:12px;background:var(--raised);display:grid;place-items:center;flex:none;color:var(--accent)}
+.plan .tx{flex:1;min-width:0}
+.plan .tx b{display:block;font-weight:700}
+.plan .tx span{font-size:14px;color:var(--muted)}
+.mastery{display:flex;flex-direction:column;gap:12px}
+.mrow{display:grid;grid-template-columns:150px 1fr 44px;gap:12px;align-items:center;font-size:14.5px}
+.bar{height:8px;border-radius:5px;background:var(--raised);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px;background:var(--accent)}
+@media (max-width:420px){.mrow{grid-template-columns:118px 1fr 38px;font-size:13.5px}}
+.trust{font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:flex-start}
+
+/* monitor */
+.monitor{background:var(--mon-bg);color:var(--mon-fg);border-radius:var(--r-lg);border:1px solid var(--mon-line);overflow:hidden}
+.mon-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--mon-line);font-family:var(--font-data);font-size:12px;color:var(--mon-muted);gap:10px}
+.mon-head b{color:var(--mon-fg);font-weight:600}
+.mon-body{display:grid;grid-template-columns:1fr 168px}
+.wave{position:relative;min-width:0}
+.wave canvas{display:block;width:100%;height:270px}
+.nums{border-left:1px solid var(--mon-line);display:grid;grid-template-columns:1fr 1fr;align-content:start}
+.num{padding:8px 10px;border-bottom:1px solid var(--mon-line);min-width:0}
+.num:nth-child(odd){border-right:1px solid var(--mon-line)}
+.num .k{font-family:var(--font-data);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mon-muted);white-space:nowrap}
+.num .v{font-family:var(--font-data);font-size:20px;font-weight:600;line-height:1.2;font-variant-numeric:tabular-nums}
+.num .u{font-size:10px;color:var(--mon-muted);margin-left:2px}
+.num.p .v{color:var(--mon-p)} .num.f .v{color:var(--mon-f)} .num.v2 .v{color:var(--mon-v)}
+.num.alarm{background:rgba(255,95,107,.16)} .num.alarm .v{color:#ff8a93}
+.num.pending .v{color:var(--mon-muted)}
+@media (max-width:560px){.mon-body{grid-template-columns:1fr}.nums{border-left:0;border-top:1px solid var(--mon-line);grid-template-columns:repeat(5,1fr)}.num:nth-child(odd){border-right:0}.num{border-right:1px solid var(--mon-line);padding:7px 7px}.num:nth-child(5n){border-right:0}.num .k{font-size:9px;letter-spacing:.03em}.num .v{font-size:16px}.num .u{display:block;margin-left:0;line-height:1.1}.wave canvas{height:230px}}
+.mon-head #modeTag{white-space:nowrap}
+.alarmbar{display:flex;gap:8px;align-items:center;padding:8px 14px;background:rgba(255,95,107,.16);color:#ffb3b9;font-family:var(--font-data);font-size:12px;border-top:1px solid var(--mon-line)}
+
+/* sim controls */
+.modes{display:inline-grid;grid-template-columns:1fr 1fr;background:var(--raised);border-radius:10px;padding:3px;border:1px solid var(--line)}
+.modes button{border:0;background:none;padding:7px 16px;border-radius:8px;font-weight:700;font-size:14px;color:var(--muted)}
+.modes button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:460px){.ctrls{grid-template-columns:1fr}}
+.ctrl{background:var(--raised);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px}
+.ctrl .lab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ctrl .lab span{font-size:13px;color:var(--muted);font-weight:600}
+.ctrl .lab output{font-family:var(--font-data);font-size:18px;font-weight:600}
+.ctrl .lab small{font-family:var(--font-data);font-size:11px;color:var(--muted)}
+.ctrl .adj{display:grid;grid-template-columns:34px 1fr 34px;gap:8px;align-items:center;margin-top:6px}
+.ctrl .adj button{height:34px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:18px;line-height:1}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.actions .btn{padding:10px 8px;font-size:14px;min-height:44px}
+.goals{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.goals li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
+.gdot{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;margin-top:1px;border:1.5px solid var(--faint);color:var(--faint)}
+.gdot.ok{background:var(--good);border-color:var(--good);color:var(--bg)}
+.gdot.no{border-color:var(--crit);color:var(--crit)}
+.abg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
+.abg div{background:var(--raised);border-radius:10px;padding:8px 4px}
+.abg .k{font-size:11px;color:var(--muted);font-family:var(--font-data)}
+.abg .v{font-family:var(--font-data);font-weight:600;font-size:17px}
+.coach{font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.coach b{color:var(--fg)}
+details summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";font-family:var(--font-data);color:var(--muted);font-size:18px}
+details[open] summary::after{content:"\2212"}
+
+/* cases */
+.clist{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.clist{grid-template-columns:1fr}}
+.ccard{display:flex;flex-direction:column;gap:10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px;color:var(--fg);text-decoration:none}
+.ccard .meta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ccard p{font-size:14.5px;color:var(--muted)}
+.vitals{display:grid;grid-template-columns:repeat(4,1fr);background:var(--mon-bg);color:var(--mon-fg);border-radius:var(--r-md);border:1px solid var(--mon-line);overflow:hidden}
+.vitals div{padding:8px 10px;border-right:1px solid var(--mon-line)}
+.vitals div:last-child{border-right:0}
+.vitals .k{font-family:var(--font-data);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mon-muted)}
+.vitals .v{font-family:var(--font-data);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.vitals .hr .v{color:var(--mon-f)} .vitals .sp .v{color:var(--mon-v)} .vitals .pp .v{color:var(--mon-p)} .vitals .bp .v{color:#ff9aa3}
+.ventline{font-family:var(--font-data);font-size:12px;color:var(--mon-muted);padding:7px 10px;border-top:1px solid var(--mon-line);grid-column:1/-1;background:var(--mon-bg)}
+.narr{font-size:16.5px;line-height:1.6;max-width:62ch}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:13px 14px;font-size:15.5px;line-height:1.45;display:flex;gap:12px;align-items:flex-start}
+.choice .key{flex:none;width:24px;height:24px;border-radius:7px;background:var(--raised);display:grid;place-items:center;font-family:var(--font-data);font-size:12px;font-weight:600;color:var(--muted)}
+.choice:disabled{cursor:default}
+.choice.sel-best,.choice.is-correct{border-color:var(--good);background:var(--good-soft)}
+.choice.sel-ok{border-color:var(--warn);background:var(--warn-soft)}
+.choice.sel-bad,.choice.is-wrong{border-color:var(--crit);background:var(--crit-soft)}
+.choice.dim{opacity:.55}
+.fb{border-radius:var(--r-md);padding:14px;background:var(--raised);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px;font-size:15px}
+.refs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:13.5px}
+.refs li{display:flex;gap:10px;align-items:baseline}
+.refs .pm{flex:none;font-family:var(--font-data);font-size:11.5px;padding:2px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent);text-decoration:none;white-space:nowrap}
+.refs .pm.none{background:var(--raised);color:var(--muted)}
+.progress{height:4px;background:var(--raised);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.points{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.score{font-family:var(--font-display);font-size:48px;font-weight:800;line-height:1}
+
+/* review cards */
+.flash{min-height:300px;display:flex;flex-direction:column;gap:14px;justify-content:space-between}
+.flash .front{font-family:var(--font-display);font-size:22px;line-height:1.3;font-weight:700;text-wrap:balance}
+.flash .back{font-size:16.5px;line-height:1.6;border-top:1px dashed var(--line);padding-top:14px}
+.grades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grade{border-radius:var(--r-md);border:1px solid var(--line);background:var(--surface);padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;font-size:14px}
+.grade small{font-family:var(--font-data);font-size:11px;color:var(--muted);font-weight:400}
+.grade.again{color:var(--crit)} .grade.easy{color:var(--good)}
+.linked{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--muted)}
+.linked a{font-weight:600}
+
+/* sheet */
+.sheet-back{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:22px 22px 0 0;max-width:640px;width:100%;max-height:86vh;overflow:auto;
+  padding:22px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px))}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.src{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-top:1px solid var(--line)}
+.src:first-child{border-top:0}
+.src .t{font-weight:600}
+.src .c{font-size:13.5px;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <a class="brand" href="#home" aria-label="Plateau home" style="color:var(--fg);text-decoration:none">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="0.5" y="0.5" width="25" height="25" rx="7" fill="var(--accent)"/><path d="M4 18h3.5l2-9h7l1.2 5H22" fill="none" stroke="var(--on-accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Plateau
+    </a>
+    <div class="spacer"></div>
+    <div class="lvl" id="lvl"></div>
+    <a class="iconbtn" href="#sources" aria-label="Sources and updates" style="color:var(--fg)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2.5Z"/><path d="M8 7h8M8 11h6"/></svg></a>
+  </header>
+  <main id="view"></main>
+</div>
+<nav class="tabbar" aria-label="Sections"><div class="in" id="tabs"></div></nav>
+
+<script>
+"use strict";
+/* ================= CONTENT ================= */
+const CONTENT_VERSION = "1.0";
+const REVIEWED = "2026-11-08";
+const NEXT_SCAN = "Dec 1, 2026";
+
+const TOPICS = {basics:"Modes & settings", ards:"ARDS", obstructive:"Obstructive disease", trouble:"Troubleshooting", liberation:"Liberation", niv:"NIV & sedation"};
+
+const SOURCES = {
+  fan17:{kind:"Guideline",title:"ATS/ESICM/SCCM guideline: mechanical ventilation in adults with ARDS",cite:"Fan E, et al. Am J Respir Crit Care Med. 2017;195:1253-63",pmid:"28459336"},
+  ats24:{kind:"Guideline",title:"ATS guideline update: management of adults with ARDS (steroids, ECMO, NMB, PEEP/recruitment)",cite:"Qadir N, et al. Am J Respir Crit Care Med. 2024;209:24-36",pmid:"38032683"},
+  esicm23:{kind:"Guideline",title:"ESICM guidelines on ARDS: definition, phenotyping and respiratory support",cite:"Grasselli G, et al. Intensive Care Med. 2023;49:727-59",pmid:"37326646"},
+  global24:{kind:"Definition",title:"A new global definition of ARDS",cite:"Matthay MA, et al. Am J Respir Crit Care Med. 2024;209:37-47",pmid:"37487152"},
+  berlin:{kind:"Definition",title:"Acute respiratory distress syndrome: the Berlin Definition",cite:"ARDS Definition Task Force. JAMA. 2012;307:2526-33",pmid:"22797452"},
+  girard17:{kind:"Guideline",title:"ATS/CHEST guideline: liberation from mechanical ventilation (rehabilitation, liberation protocols, cuff leak test)",cite:"Girard TD, et al. Am J Respir Crit Care Med. 2017;195:120-33",pmid:"27762595"},
+  ouellette17:{kind:"Guideline",title:"ACCP/ATS guideline: liberation (SBT pressure augmentation, sedation protocols, preventive NIV)",cite:"Ouellette DR, et al. Chest. 2017;151:166-80",pmid:"27818331"},
+  niv17:{kind:"Guideline",title:"ERS/ATS guideline: noninvasive ventilation for acute respiratory failure",cite:"Rochwerg B, et al. Eur Respir J. 2017;50:1602426",pmid:"28860265"},
+  padis:{kind:"Guideline",title:"SCCM PADIS guideline: pain, agitation/sedation, delirium, immobility, sleep",cite:"Devlin JW, et al. Crit Care Med. 2018;46:e825-73",pmid:"30113379"},
+  ssc21:{kind:"Guideline",title:"Surviving Sepsis Campaign: international guidelines 2021",cite:"Evans L, et al. Crit Care Med. 2021;49:e1063-143",pmid:"34605781"},
+  ardsnet:{kind:"Trial",title:"Lower vs traditional tidal volumes in ALI/ARDS (ARMA)",cite:"ARDS Network. N Engl J Med. 2000;342:1301-8",pmid:"10793162"},
+  proseva:{kind:"Trial",title:"Prone positioning in severe ARDS (PROSEVA)",cite:"Guérin C, et al. N Engl J Med. 2013;368:2159-68",pmid:"23688302"},
+  art:{kind:"Trial",title:"Lung recruitment and titrated PEEP vs low PEEP (ART)",cite:"ART Investigators. JAMA. 2017;318:1335-45",pmid:"28973363"},
+  alveoli:{kind:"Trial",title:"Higher vs lower PEEP in ARDS (ALVEOLI)",cite:"Brower RG, et al. N Engl J Med. 2004;351:327-36",pmid:"15269312"},
+  amato:{kind:"Analysis",title:"Driving pressure and survival in ARDS",cite:"Amato MBP, et al. N Engl J Med. 2015;372:747-55",pmid:"25693014"},
+  rose:{kind:"Trial",title:"Early neuromuscular blockade in moderate to severe ARDS (ROSE)",cite:"NHLBI PETAL Network. N Engl J Med. 2019;380:1997-2008",pmid:"31112383"},
+  acurasys:{kind:"Trial",title:"Neuromuscular blockers in early ARDS (ACURASYS)",cite:"Papazian L, et al. N Engl J Med. 2010;363:1107-16",pmid:"20843245"},
+  factt:{kind:"Trial",title:"Liberal vs conservative fluid management in acute lung injury (FACTT)",cite:"NHLBI ARDS Network. N Engl J Med. 2006;354:2564-75",pmid:"16714767"},
+  abc:{kind:"Trial",title:"Paired spontaneous awakening and breathing trials (ABC)",cite:"Girard TD, et al. Lancet. 2008;371:126-34",pmid:"18191684"},
+  subira:{kind:"Trial",title:"30-min pressure support vs 2-h T-piece SBT",cite:"Subirà C, et al. JAMA. 2019;321:2175-82",pmid:"31184740"},
+  thille:{kind:"Trial",title:"Post-extubation high-flow plus NIV vs high-flow alone in high-risk patients (HIGH-WEAN)",cite:"Thille AW, et al. JAMA. 2019;322:1465-75",pmid:"31577036"},
+  yang:{kind:"Study",title:"Prospective study of weaning indexes: the rapid shallow breathing index",cite:"Yang KL, Tobin MJ. N Engl J Med. 1991;324:1445-50",pmid:"2023921"},
+  phys:{kind:"Physiology",title:"Core respiratory mechanics (no single source)",cite:"Standard physiology",pmid:null}
+};
+
+const CARDS = [
+  {id:"c-ppeak-pplat",topic:"trouble",f:"High peak pressure, normal plateau. What kind of problem is it?",b:"Resistance (airway or tube): kink, biting, secretions, mucus plug, bronchospasm. Peak minus plateau reflects resistance × flow.",link:{t:"case",id:"alarm"},src:["phys"]},
+  {id:"c-pplat-high",topic:"trouble",f:"Peak AND plateau both rose by the same amount. Differential?",b:"Compliance problem: pneumothorax, mainstem intubation, atelectasis or lobar collapse, pulmonary edema, worsening ARDS, abdominal distension, auto-PEEP.",link:{t:"case",id:"ptx"},src:["phys"]},
+  {id:"c-dope",topic:"trouble",f:"Ventilated patient is crashing. First move, and the mnemonic?",b:"Disconnect and hand-bag with 100% O₂. DOPES: Displacement, Obstruction, Pneumothorax, Equipment, Stacked breaths (auto-PEEP). Easy to bag points to the ventilator; hard to bag points to the tube or patient.",link:{t:"case",id:"alarm"},src:["phys"]},
+  {id:"c-tension",topic:"trouble",f:"Ventilated, hypotensive, unilateral absent breath sounds, rising plateau right after a line. Next step?",b:"Immediate decompression (needle or finger thoracostomy), then chest tube. Don't wait for imaging.",link:{t:"case",id:"ptx"},src:["phys"]},
+  {id:"c-mainstem",topic:"trouble",f:"Plateau up, left breath sounds diminished, tube 4 cm deeper than documented. Diagnosis and fix?",b:"Right mainstem intubation. Withdraw to the documented depth (often about 21 cm at the lip in women, 23 cm in men) and confirm.",link:{t:"case",id:"ptx"},src:["phys"]},
+  {id:"c-hyperoxia",topic:"trouble",f:"Saturation recovered on FiO₂ 1.0. What now?",b:"Titrate to the lowest FiO₂ that keeps SpO₂ about 92–96% (ARDS protocols: 88–95%). Prolonged hyperoxia adds risk without benefit.",link:{t:"case",id:"alarm"},src:["ardsnet"]},
+  {id:"c-pbw",topic:"basics",f:"Predicted body weight formulas?",b:"Men: 50 + 0.91 × (height cm − 152.4). Women: 45.5 + 0.91 × (height cm − 152.4). Use height, never actual weight.",link:{t:"mission",id:"m-basic"},src:["ardsnet"]},
+  {id:"c-pc-vc",topic:"basics",f:"Volume control vs pressure control: what's set and what varies?",b:"Volume control: you set Vt and flow; pressure varies with resistance and compliance. Pressure control: you set pressure and inspiratory time; Vt varies. In pressure control, watch exhaled Vt and minute ventilation alarms.",link:{t:"mission",id:"m-ards"},src:["phys"]},
+  {id:"c-co2",topic:"basics",f:"Which settings move PaCO₂? Which move PaO₂?",b:"PaCO₂: alveolar ventilation (RR and Vt) and dead space. PaO₂: FiO₂ and mean airway pressure (mainly PEEP, also inspiratory time).",link:{t:"mission",id:"m-basic"},src:["phys"]},
+  {id:"c-measure",topic:"basics",f:"How do you measure plateau pressure and auto-PEEP?",b:"Plateau: inspiratory hold of 0.5–1 s in a passive patient. Auto-PEEP: expiratory hold; total PEEP minus set PEEP.",link:{t:"mission",id:"m-asthma"},src:["phys"]},
+  {id:"c-ie",topic:"basics",f:"How do you calculate inspiratory time and I:E in volume control?",b:"Ti = Vt ÷ flow (0.5 L ÷ 1 L/s = 0.5 s). Te = 60/RR − Ti. I:E = Ti : Te.",link:{t:"mission",id:"m-asthma"},src:["phys"]},
+  {id:"c-dp",topic:"basics",f:"Driving pressure: definition and target?",b:"Plateau minus PEEP (equal to Vt ÷ compliance). The variable most strongly linked to survival in Amato 2015; many clinicians aim for ≤ 15 cm H₂O.",link:{t:"mission",id:"m-ards"},src:["amato"]},
+  {id:"c-lowvt",topic:"ards",f:"ARDS tidal volume and plateau targets, and the trial behind them?",b:"Vt 6 mL/kg PBW (range 4–8), plateau ≤ 30 cm H₂O. ARMA: mortality 31.0% vs 39.8% compared with 12 mL/kg.",link:{t:"case",id:"ards"},src:["ardsnet","fan17"]},
+  {id:"c-berlin",topic:"ards",f:"Berlin ARDS severity cutoffs?",b:"On PEEP or CPAP ≥ 5: mild P/F 201–300, moderate 101–200, severe ≤ 100. Onset within 1 week; bilateral opacities; not fully explained by heart failure or fluid overload.",link:{t:"case",id:"ards"},src:["berlin"]},
+  {id:"c-global",topic:"ards",f:"What did the 2024 global ARDS definition add?",b:"SpO₂/FiO₂ ≤ 315 (when SpO₂ ≤ 97%) as an alternative to P/F; non-intubated ARDS on high-flow ≥ 30 L/min or NIV/CPAP ≥ 5; ultrasound allowed for imaging; a modified version for resource-limited settings.",link:{t:"q",id:"q16"},src:["global24"]},
+  {id:"c-peep",topic:"ards",f:"PEEP strategy in moderate to severe ARDS?",b:"Higher rather than lower PEEP is suggested (conditional). Titrate while keeping plateau ≤ 30, watching driving pressure and blood pressure.",link:{t:"case",id:"ards"},src:["fan17","alveoli"]},
+  {id:"c-rm",topic:"ards",f:"Prolonged high-pressure recruitment maneuvers in ARDS?",b:"Recommended against (ATS 2024). ART trial: higher 28-day mortality with aggressive recruitment plus titrated PEEP.",link:{t:"case",id:"ards"},src:["ats24","art"]},
+  {id:"c-prone",topic:"ards",f:"Prone positioning: who, how long, and the evidence?",b:"P/F < 150 on FiO₂ ≥ 0.6 and PEEP ≥ 5 after initial optimization. At least 12 h/day (PROSEVA averaged about 17 h). 28-day mortality 16.0% vs 32.8%.",link:{t:"case",id:"ards"},src:["proseva","fan17"]},
+  {id:"c-permissive",topic:"ards",f:"Permissive hypercapnia: usual pH floor and key contraindication?",b:"Generally tolerate pH down to about 7.15–7.20 while protecting the lung; raise RR (up to 35) before Vt. Avoid with raised intracranial pressure; caution in RV failure.",link:{t:"case",id:"ards"},src:["ardsnet"]},
+  {id:"c-steroids",topic:"ards",f:"Corticosteroids in ARDS?",b:"ATS 2024 suggests corticosteroids for ARDS (conditional recommendation, moderate certainty).",link:{t:"q",id:"q17"},src:["ats24"]},
+  {id:"c-fluids",topic:"ards",f:"Fluid strategy once ARDS shock resolves?",b:"Conservative. FACTT: more ventilator-free days, no mortality difference.",link:{t:"case",id:"ards"},src:["factt"]},
+  {id:"c-nmb",topic:"ards",f:"Neuromuscular blockade in ARDS?",b:"Not routine. ROSE showed no mortality benefit vs lighter sedation. ATS 2024 suggests NMB in early severe ARDS; ESICM 2023 advises against routine continuous infusion.",link:{t:"case",id:"ards"},src:["rose","ats24","esicm23"]},
+  {id:"c-ecmo",topic:"ards",f:"Where does VV-ECMO fit in ARDS?",b:"Suggested for selected patients with severe ARDS (ATS 2024, conditional), after lung-protective ventilation and proning, at experienced centers.",link:{t:"q",id:"q17"},src:["ats24"]},
+  {id:"c-autopeep",topic:"obstructive",f:"Hypotension right after intubation in asthma or COPD?",b:"Dynamic hyperinflation (auto-PEEP) until proven otherwise. Disconnect for 30–60 s; if BP recovers, that confirms it. Keep tension pneumothorax on the list.",link:{t:"case",id:"asthma"},src:["phys"]},
+  {id:"c-te",topic:"obstructive",f:"Biggest lever to lengthen expiratory time?",b:"Lower the respiratory rate. Smaller gains: shorter Ti (higher inspiratory flow) and smaller Vt.",link:{t:"mission",id:"m-asthma"},src:["phys"]},
+  {id:"c-ext-peep",topic:"obstructive",f:"When does adding external PEEP help auto-PEEP?",b:"Spontaneously breathing, flow-limited COPD with missed triggers: set about 75–85% of measured auto-PEEP. Not in a passive asthmatic, where it can add to hyperinflation.",link:{t:"q",id:"q7"},src:["phys"]},
+  {id:"c-copd-co2",topic:"obstructive",f:"Chronic CO₂ retainer on the vent: what PaCO₂ do you target?",b:"Their baseline, not 40. Over-ventilation causes alkalemia and renal bicarbonate loss, which makes extubation harder.",link:{t:"mission",id:"m-copd"},src:["phys"]},
+  {id:"c-satsbt",topic:"liberation",f:"Evidence for pairing SAT and SBT?",b:"ABC trial: daily paired awakening and breathing trials increased ventilator-free days and lowered 1-year mortality.",link:{t:"case",id:"sbt"},src:["abc"]},
+  {id:"c-sbt-method",topic:"liberation",f:"How should the first SBT be run?",b:"Inspiratory pressure augmentation (PS 5–8 cm H₂O) rather than T-piece or CPAP (ACCP/ATS). Subirà 2019: 30-min PS 8 beat a 2-h T-piece for successful extubation.",link:{t:"case",id:"sbt"},src:["ouellette17","subira"]},
+  {id:"c-rsbi",topic:"liberation",f:"RSBI formula and cutoff?",b:"RR ÷ Vt in liters. Below 105 predicts success (Yang and Tobin 1991). Clinical tolerance still decides.",link:{t:"case",id:"sbt"},src:["yang"]},
+  {id:"c-sbt-fail",topic:"liberation",f:"Signs to stop an SBT?",b:"RR > 35 sustained, SpO₂ < 90%, HR > 140 or a rise > 20%, SBP > 180 or < 90, agitation, diaphoresis, accessory muscle use, change in mental status.",link:{t:"q",id:"q10"},src:["ouellette17"]},
+  {id:"c-cuffleak",topic:"liberation",f:"Cuff leak test: who gets one, and what if there's no leak?",b:"High risk for stridor: traumatic intubation, intubation > 6 days, large tube, female sex, reintubation after unplanned extubation. No leak but otherwise ready: systemic steroids at least 4 h before extubation; no need to repeat the test.",link:{t:"case",id:"sbt"},src:["girard17"]},
+  {id:"c-postext",topic:"liberation",f:"Post-extubation support for high-risk patients?",b:"Preventive NIV right after extubation (ACCP/ATS), especially in hypercapnic patients. HIGH-WEAN: high-flow plus NIV cut day-7 reintubation vs high-flow alone (11.8% vs 18.2%).",link:{t:"case",id:"sbt"},src:["ouellette17","thille"]},
+  {id:"c-niv-strong",topic:"niv",f:"Two settings with strong recommendations for NIV?",b:"Hypercapnic COPD exacerbation with pH ≤ 7.35, and cardiogenic pulmonary edema (bilevel or CPAP).",link:{t:"q",id:"q13"},src:["niv17"]},
+  {id:"c-niv-contra",topic:"niv",f:"Contraindications to NIV?",b:"Arrest or need for emergent intubation, unable to protect airway or clear secretions, vomiting or upper GI bleed, facial trauma, severe agitation, hemodynamic instability.",link:{t:"q",id:"q13"},src:["niv17"]},
+  {id:"c-padis",topic:"niv",f:"PADIS approach to sedation on the vent?",b:"Analgesia first, then light sedation (RASS −2 to 0). Propofol or dexmedetomidine over benzodiazepines.",link:{t:"q",id:"q15"},src:["padis"]}
+];
+
+/* Case grading: best = 10, ok = 5, bad = 0 */
+const CASES = [
+ {id:"alarm",topic:"trouble",title:"The 2 a.m. pressure alarm",teaser:"High-pressure alarm and falling SpO₂ in a COPD patient. Tell resistance from compliance.",mins:4,
+  nodes:{
+   start:{mon:{hr:118,bp:"128/76",spo2:86,pp:"48",vent:"VC · Vt 450 · RR 18 · PEEP 5 · FiO₂ 0.40"},
+    text:"64-year-old man with COPD, intubated 2 days ago for pneumonia. The nurse pages you: the vent keeps alarming \"high pressure\" and SpO₂ has fallen from 95% to 86%. Peak pressure was 28 this afternoon and is now 48 cm H₂O. He is not on paralytics.",
+    q:"What do you do first?",
+    c:[
+     {t:"Go to the bedside, raise FiO₂ to 1.0, and work through a systematic check",g:"best",fb:"Protect oxygenation while you diagnose. If he were crashing (rapid desaturation, hypotension), you'd disconnect and hand-bag with 100% O₂: easy bagging points to the ventilator, hard bagging to the tube or patient.",next:"n2",cards:["c-dope"]},
+     {t:"Order a stat portable chest X-ray and reassess when it's done",g:"bad",fb:"An X-ray takes time and won't explain everything. The bedside exam and the ventilator's own measurements answer this faster.",next:"n2"},
+     {t:"Raise the high-pressure alarm limit to 55 cm H₂O so breaths get delivered",g:"bad",fb:"The pressure limit also ends the breath early, so raising it hides the problem and risks barotrauma. Find the cause first.",next:"n2"},
+     {t:"Give a sedative bolus and start a paralytic",g:"bad",fb:"Sedation can help if he's biting or fighting the vent, but paralyzing before you know the cause can mask a plug or pneumothorax.",next:"n2"}]},
+   n2:{mon:{hr:112,bp:"130/78",spo2:90,pp:"48 / 22",vent:"VC · Vt 450 · RR 18 · PEEP 5 · FiO₂ 1.0"},
+    text:"On FiO₂ 1.0 his SpO₂ is 90%. The tube is at 24 cm at the lip (unchanged), he isn't biting, and breath sounds are coarse but present on both sides. Inspiratory hold: peak 48, plateau 22 cm H₂O.",
+    q:"What does the peak-to-plateau gap tell you?",
+    c:[
+     {t:"Peak high, plateau normal: a resistance problem (tube, secretions, bronchospasm)",g:"best",fb:"Peak minus plateau (here 26 cm H₂O) reflects airway resistance × flow. Plateau reflects lungs and chest wall. A wide gap points to the tube or airways.",next:"n3",cards:["c-ppeak-pplat"]},
+     {t:"Both are up: a compliance problem (pneumothorax, mainstem, edema)",g:"bad",fb:"A compliance problem raises plateau too. Plateau is 22, so the lung itself isn't stiffer.",next:"n3",cards:["c-pplat-high"]},
+     {t:"It proves auto-PEEP is the main issue",g:"ok",fb:"Auto-PEEP is possible in COPD, but you'd need an expiratory hold to measure it. The wide gap is the main clue and points to resistance.",next:"n3",cards:["c-measure"]}]},
+   n3:{mon:{hr:112,bp:"130/78",spo2:90,pp:"48 / 22",vent:"VC · Vt 450 · RR 18 · PEEP 5 · FiO₂ 1.0"},
+    text:"Resistance problem confirmed. Your differential: kinked or bitten tube, secretions or mucus plug, bronchospasm.",
+    q:"Fastest next step?",
+    c:[
+     {t:"Pass a suction catheter through the tube",g:"best",fb:"It tests tube patency and treats the most common cause in seconds. The catheter meets resistance at 20 cm, and you suction a thick mucus plug.",next:"n4",cards:["c-ppeak-pplat"]},
+     {t:"Needle decompression of the right chest",g:"bad",fb:"Nothing suggests pneumothorax: plateau is normal and breath sounds are bilateral. Needling a chest without a pneumothorax can cause one.",next:"n4"},
+     {t:"Albuterol through the circuit, recheck in 30 minutes",g:"ok",fb:"Bronchodilators treat bronchospasm, but suctioning checks and fixes the tube first and takes seconds.",next:"n4"},
+     {t:"Furosemide 40 mg IV",g:"bad",fb:"Pulmonary edema lowers compliance and raises plateau. This is a resistance pattern.",next:"n4"}]},
+   n4:{mon:{hr:96,bp:"124/72",spo2:99,pp:"30 / 21",vent:"VC · Vt 450 · RR 18 · PEEP 5 · FiO₂ 1.0"},
+    text:"After suctioning: peak 30, plateau 21, SpO₂ 99% on FiO₂ 1.0.",
+    q:"What now?",
+    c:[
+     {t:"Wean FiO₂ to the lowest that keeps SpO₂ about 92–96%, and review humidification and airway clearance",g:"best",fb:"Avoid unnecessary hyperoxia, and ask why he plugged: humidification, secretion burden, and whether recurrent plugs need bronchoscopy.",next:null,cards:["c-hyperoxia"]},
+     {t:"Leave FiO₂ at 1.0 overnight to be safe",g:"bad",fb:"Once saturation is adequate, high FiO₂ adds no benefit and can cause absorption atelectasis and oxygen toxicity.",next:null}]}
+  },
+  debrief:["Peak pressure = resistive + elastic pressure. Plateau (inspiratory hold, no flow) = elastic pressure only.","High peak, normal plateau: kinked or bitten tube, secretions, mucus plug, bronchospasm.","High peak AND high plateau: pneumothorax, mainstem intubation, atelectasis, pulmonary edema, abdominal distension, auto-PEEP.","Crashing patient: disconnect, hand-bag on 100% O₂, then DOPES (Displacement, Obstruction, Pneumothorax, Equipment, Stacked breaths)."],
+  refs:["phys","fan17"]},
+
+ {id:"ards",topic:"ards",title:"Pneumonia to ARDS",teaser:"Septic shock and refractory hypoxemia. Set the vent, classify, choose PEEP, decide on proning.",mins:6,
+  nodes:{
+   start:{mon:{hr:118,bp:"96/58",spo2:89,pp:"38 / 33",vent:"VC · Vt 550 · RR 14 · PEEP 5 · FiO₂ 1.0 · norepi 0.08"},
+    text:"54-year-old woman, 163 cm and 85 kg, intubated in the ED for hypoxemic respiratory failure from pneumococcal pneumonia with septic shock. Chest X-ray: new bilateral opacities. Echo: normal EF. ABG on these settings: 7.26 / PaCO₂ 48 / PaO₂ 62.",
+    q:"Her predicted body weight is about 55 kg. What tidal volume do you set?",
+    c:[
+     {t:"330 mL (6 mL/kg PBW)",g:"best",fb:"Low tidal volume (6 mL/kg PBW, range 4–8) with plateau ≤ 30 lowered mortality in ARMA (31.0% vs 39.8%). Female PBW = 45.5 + 0.91 × (163 − 152.4) ≈ 55 kg.",next:"n2",cards:["c-lowvt","c-pbw"]},
+     {t:"440 mL (8 mL/kg PBW)",g:"ok",fb:"8 mL/kg is the top of the range and ARMA started there, then stepped down to 6 within hours. With plateau already 33, start closer to 6.",next:"n2",cards:["c-lowvt"]},
+     {t:"Keep 550 mL, since her actual weight makes it about 6.5 mL/kg",g:"bad",fb:"Lungs scale with height, not weight. 550 mL is 10 mL/kg PBW, and plateau is already above 30.",next:"n2",cards:["c-pbw"]},
+     {t:"250 mL to rest the lung as much as possible",g:"bad",fb:"4.5 mL/kg is below the usual start and worsens hypercapnia. Go below 6 only if plateau stays above 30.",next:"n2"}]},
+   n2:{mon:{hr:114,bp:"98/60",spo2:88,pp:"30 / 24",vent:"VC · Vt 330 · RR 28 · PEEP 5 · FiO₂ 1.0 · norepi 0.08"},
+    text:"Tidal volume is now 330 mL with RR 28. Repeat PaO₂ is 62 on FiO₂ 1.0 and PEEP 5, so P/F = 62.",
+    q:"How severe is her ARDS by the Berlin definition?",
+    c:[
+     {t:"Severe (P/F ≤ 100 on PEEP ≥ 5)",g:"best",fb:"Berlin strata on PEEP or CPAP ≥ 5: mild 201–300, moderate 101–200, severe ≤ 100. The 2024 global definition keeps these and adds SpO₂/FiO₂ criteria and non-intubated patients on high-flow.",next:"n3",cards:["c-berlin","c-global"]},
+     {t:"Moderate",g:"bad",fb:"Moderate is P/F 101–200. Hers is 62.",next:"n3",cards:["c-berlin"]},
+     {t:"Can't classify until PEEP is at least 10",g:"bad",fb:"Berlin requires PEEP or CPAP ≥ 5, which she has.",next:"n3",cards:["c-berlin"]}]},
+   n3:{mon:{hr:112,bp:"100/60",spo2:88,pp:"30 / 24",vent:"VC · Vt 330 · RR 28 · PEEP 5 · FiO₂ 1.0 · norepi 0.06"},
+    text:"Plateau is 24 now, but she's still on FiO₂ 1.0 with SpO₂ 88%.",
+    q:"How do you approach PEEP?",
+    c:[
+     {t:"Raise PEEP stepwise (toward about 14–18, using the higher PEEP/FiO₂ table), keeping plateau ≤ 30 and watching blood pressure",g:"best",fb:"For moderate to severe ARDS, guidelines suggest higher rather than lower PEEP (conditional). Recheck plateau, driving pressure, and hemodynamics after each change.",next:"n4",cards:["c-peep"]},
+     {t:"Prolonged recruitment maneuver (PEEP 35–40 for 1–2 minutes), then high PEEP",g:"bad",fb:"ART found higher mortality with aggressive recruitment plus titrated PEEP. ATS 2024 recommends against prolonged high-pressure recruitment maneuvers.",next:"n4",cards:["c-rm"]},
+     {t:"Keep PEEP 5 and FiO₂ 1.0 to avoid barotrauma",g:"bad",fb:"This accepts oxygen toxicity and ongoing derecruitment. PEEP is the main oxygenation lever in recruitable lung.",next:"n4",cards:["c-peep"]}]},
+   n4:{mon:{hr:104,bp:"108/64",spo2:92,pp:"35 / 29",vent:"VC · Vt 330 · RR 32 · PEEP 16 · FiO₂ 0.80 · norepi 0.04"},
+    text:"Twelve hours later: PEEP 16, FiO₂ 0.8, PaO₂ 88 (P/F 110), plateau 29, driving pressure 13. ABG 7.22 / PaCO₂ 62.",
+    q:"Best next step?",
+    c:[
+     {t:"Prone positioning for at least 12 hours a day",g:"best",fb:"PROSEVA enrolled P/F < 150 on FiO₂ ≥ 0.6, and early prolonged proning cut 28-day mortality (16.0% vs 32.8%). Guidelines strongly recommend > 12 h/day in severe ARDS.",next:"n5",cards:["c-prone"]},
+     {t:"Raise tidal volume to 8 mL/kg to fix the CO₂",g:"bad",fb:"That pushes plateau above 30. Accept permissive hypercapnia and raise the rate first, up to 35.",next:"n5",cards:["c-permissive"]},
+     {t:"Inhaled nitric oxide as definitive therapy",g:"bad",fb:"Inhaled vasodilators can briefly improve oxygenation but haven't improved survival. At most a rescue bridge.",next:"n5",cards:["c-prone"]},
+     {t:"Bicarbonate infusion to normalize pH",g:"bad",fb:"Treat hypercapnia with rate first. Bicarbonate generates more CO₂ and isn't routine.",next:"n5",cards:["c-permissive"]}]},
+   n5:{mon:{hr:96,bp:"114/66",spo2:94,pp:"33 / 27",vent:"Prone · VC · Vt 330 · RR 32 · PEEP 14 · FiO₂ 0.60 · norepi 0.02"},
+    text:"She's proned and oxygenation is improving. Shock is resolving.",
+    q:"Which of these do current guidelines support for her?",
+    c:[
+     {t:"Systemic corticosteroids, and a conservative fluid strategy once shock resolves",g:"best",fb:"ATS 2024 suggests corticosteroids for ARDS (conditional, moderate certainty). FACTT showed more ventilator-free days with conservative fluids after shock.",next:null,cards:["c-steroids","c-fluids"]},
+     {t:"Switch to high-frequency oscillatory ventilation",g:"bad",fb:"Guidelines recommend against routine HFOV in moderate to severe ARDS (strong recommendation).",next:null},
+     {t:"Continuous neuromuscular blockade for 48 hours, as for every ARDS patient",g:"ok",fb:"ROSE found no mortality benefit vs lighter sedation. ATS 2024 suggests NMB in early severe ARDS; ESICM 2023 advises against routine continuous infusion. Reasonable for severe dyssynchrony, not as routine.",next:null,cards:["c-nmb"]}]}
+  },
+  debrief:["Set Vt by PBW (6 mL/kg; range 4–8). Keep plateau ≤ 30; many aim for driving pressure ≤ 15.","Moderate to severe ARDS: higher PEEP. Avoid prolonged high-pressure recruitment maneuvers.","P/F < 150 despite optimization: prone ≥ 12 h/day, started early.","Accept permissive hypercapnia; raise RR (up to 35) before Vt.","Corticosteroids (conditional), conservative fluids after shock, VV-ECMO for selected severe cases at experienced centers."],
+  refs:["ardsnet","berlin","global24","fan17","ats24","esicm23","proseva","art","amato","factt","rose"]},
+
+ {id:"asthma",topic:"obstructive",title:"The hypotensive asthmatic",teaser:"BP crashes right after intubation for status asthmaticus. Find the trapped air.",mins:4,
+  nodes:{
+   start:{mon:{hr:134,bp:"72/40",spo2:91,pp:"62",vent:"VC · Vt 550 · RR 26 · PEEP 5 · Flow 50 L/min"},
+    text:"28-year-old man with status asthmaticus, intubated 10 minutes ago after rapid hand-bagging. BP now 72/40, HR 134. His chest looks hyperexpanded, breath sounds are distant on both sides, and the trachea is midline.",
+    q:"Most likely cause of the hypotension?",
+    c:[
+     {t:"Dynamic hyperinflation (auto-PEEP) reducing venous return",g:"best",fb:"Air trapped by incomplete exhalation raises intrathoracic pressure and cuts venous return. Classic after aggressive bagging in obstructive disease. Bilateral findings favor this over tension pneumothorax, which stays on the list.",next:"n2",cards:["c-autopeep"]},
+     {t:"Septic shock",g:"bad",fb:"No infection history, and the timing right after intubation and bagging points to the ventilator.",next:"n2",cards:["c-autopeep"]},
+     {t:"Anaphylaxis to the induction drug",g:"ok",fb:"Possible but less likely without rash or other signs. Timing with fast bagging fits auto-PEEP.",next:"n2",cards:["c-autopeep"]}]},
+   n2:{mon:{hr:134,bp:"72/40",spo2:91,pp:"62",vent:"VC · Vt 550 · RR 26 · PEEP 5 · Flow 50 L/min"},
+    text:"You suspect auto-PEEP.",
+    q:"What's the fastest test and treatment?",
+    c:[
+     {t:"Disconnect from the ventilator for 30–60 seconds, then reassess",g:"best",fb:"If BP rises within seconds, you've confirmed dynamic hyperinflation. Some clinicians add gentle chest compression during exhalation.",next:"n3",cards:["c-autopeep"]},
+     {t:"2 L fluid bolus and start norepinephrine",g:"ok",fb:"Fluids and pressors support preload but don't remove the trapped air. Disconnect first.",next:"n3"},
+     {t:"Increase RR to 32 to treat the respiratory acidosis",g:"bad",fb:"This shortens expiratory time and worsens air trapping, potentially to cardiac arrest.",next:"n3",cards:["c-te"]}]},
+   n3:{mon:{hr:112,bp:"108/66",spo2:93,pp:"58 / 28",vent:"VC · Vt 550 · RR 26 · PEEP 5 · Flow 50 L/min"},
+    text:"After 40 seconds off the vent, BP recovers to 108/66. Back on: expiratory hold shows total PEEP 19 (auto-PEEP 14). Peak 58, plateau 28.",
+    q:"Which change lengthens expiratory time the most?",
+    c:[
+     {t:"Lower RR from 26 to 12",g:"best",fb:"Rate drives expiratory time. At RR 26 each breath gets 2.3 s total; at RR 12 it gets 5 s. Higher inspiratory flow only trims tenths of a second.",next:"n4",cards:["c-te"]},
+     {t:"Raise inspiratory flow from 50 to 80 L/min",g:"ok",fb:"Helps a little (Ti falls from 0.66 to 0.41 s), but lowering the rate does far more. Peak pressure will rise with higher flow, which is fine if plateau is safe.",next:"n4",cards:["c-te","c-ie"]},
+     {t:"Raise PEEP to 15 to match the auto-PEEP",g:"bad",fb:"In a passive, sedated asthmatic, external PEEP can add to total PEEP and worsen hyperinflation. Matching PEEP is a trigger-assist strategy for spontaneously breathing COPD patients.",next:"n4",cards:["c-ext-peep"]},
+     {t:"Raise tidal volume to 700 mL for better CO₂ clearance",g:"bad",fb:"Bigger breaths take longer to exhale and raise plateau.",next:"n4",cards:["c-te"]}]},
+   n4:{mon:{hr:104,bp:"118/70",spo2:94,pp:"50 / 22",vent:"VC · Vt 450 · RR 12 · PEEP 5 · Flow 80 L/min"},
+    text:"Now Vt 450, RR 12, flow 80. Auto-PEEP 3, plateau 22. ABG 7.18 / PaCO₂ 70.",
+    q:"How do you respond to the ABG?",
+    c:[
+     {t:"Accept permissive hypercapnia while plateau and auto-PEEP stay low; continue bronchodilators, steroids, and adequate sedation",g:"best",fb:"Hypercapnia is generally tolerated (pH about 7.15–7.20 or higher) without raised intracranial pressure. CO₂ falls as bronchospasm resolves.",next:null,cards:["c-permissive"]},
+     {t:"Raise RR back to 24 to normalize PaCO₂",g:"bad",fb:"This recreates the problem you just fixed.",next:null,cards:["c-te"]},
+     {t:"Bicarbonate infusion to pH 7.40",g:"bad",fb:"Not routine, and bicarbonate generates CO₂ he can't clear.",next:null,cards:["c-permissive"]}]}
+  },
+  debrief:["Obstructive physiology needs time to exhale: low RR, modest Vt, high inspiratory flow (short Ti).","Hypotension after intubation in asthma or COPD: think auto-PEEP first. Disconnect to test and treat; consider tension pneumothorax.","Measure plateau with an inspiratory hold and auto-PEEP with an expiratory hold. In bronchospasm, peak pressure overstates lung stress.","Permissive hypercapnia is a deliberate trade to avoid hyperinflation."],
+  refs:["phys"]},
+
+ {id:"sbt",topic:"liberation",title:"Ready to come off?",teaser:"Day 4 on the vent with COPD. Run the awakening and breathing trials, then plan the extubation.",mins:5,
+  nodes:{
+   start:{mon:{hr:84,bp:"124/70",spo2:96,pp:"22 / 17",vent:"VC · Vt 450 · RR 16 · PEEP 5 · FiO₂ 0.40 · propofol"},
+    text:"71-year-old man with COPD, ventilated 4 days for pneumonia. Off vasopressors, FiO₂ 0.40, PEEP 5, secretions manageable. Propofol infusion, RASS −3.",
+    q:"What's the plan this morning?",
+    c:[
+     {t:"Spontaneous awakening trial, and if he passes, a spontaneous breathing trial",g:"best",fb:"Pairing a daily SAT with an SBT (ABC trial) increased ventilator-free days and lowered 1-year mortality. Guidelines suggest protocols that minimize sedation and protocolized liberation.",next:"n2",cards:["c-satsbt","c-padis"]},
+     {t:"Keep him sedated until the chest X-ray clears",g:"bad",fb:"X-rays lag recovery. Readiness is clinical: improving cause, FiO₂ ≤ 0.4–0.5, PEEP ≤ 5–8, stable hemodynamics, able to trigger breaths.",next:"n2",cards:["c-satsbt"]},
+     {t:"Extubate now; his settings are low",g:"bad",fb:"He needs to show he can breathe with minimal support and protect his airway. Run an SBT first.",next:"n2",cards:["c-satsbt"]}]},
+   n2:{mon:{hr:88,bp:"130/72",spo2:96,pp:"22 / 17",vent:"VC · Vt 450 · RR 16 · PEEP 5 · FiO₂ 0.40 · sedation off"},
+    text:"SAT passed: RASS 0, follows commands, no agitation.",
+    q:"How should you run the SBT?",
+    c:[
+     {t:"Pressure support 5–8 cm H₂O (PEEP 0–5) for 30 minutes",g:"best",fb:"ACCP/ATS suggest inspiratory pressure augmentation over T-piece or CPAP for the first SBT. Subirà 2019: 30-min PS 8 led to more successful extubations than a 2-h T-piece.",next:"n3",cards:["c-sbt-method"]},
+     {t:"T-piece for 2 hours",g:"ok",fb:"Valid and widely used, but more demanding. Pressure support for 30 minutes is now suggested for the first trial.",next:"n3",cards:["c-sbt-method"]},
+     {t:"CPAP 5 overnight to see how he does",g:"bad",fb:"Too long. Prolonged trials can tire patients without adding prognostic information.",next:"n3",cards:["c-sbt-method"]}]},
+   n3:{mon:{hr:92,bp:"132/74",spo2:95,pp:"13",vent:"PSV · PS 8 · PEEP 5 · FiO₂ 0.40"},
+    text:"After 30 minutes: RR 24, Vt 380 mL, SpO₂ 95%, HR 92 (was 84). No accessory muscle use. Calm.",
+    q:"How do you interpret the trial?",
+    c:[
+     {t:"Passed: RSBI = 24 ÷ 0.38 ≈ 63, below 105, with no signs of intolerance",g:"best",fb:"RSBI < 105 predicted weaning success in Yang and Tobin. Clinical tolerance matters more: watch for RR > 35, SpO₂ < 90%, HR > 140 or a rise > 20%, SBP > 180 or < 90, agitation, diaphoresis.",next:"n4",cards:["c-rsbi","c-sbt-fail"]},
+     {t:"Failed, because RR is above 20",g:"bad",fb:"RR 24 is fine. Failure usually means RR above 35 sustained, with distress.",next:"n4",cards:["c-sbt-fail"]},
+     {t:"Can't tell without an ABG",g:"ok",fb:"An ABG isn't required when he's comfortable and well saturated, though it's reasonable in a CO₂ retainer.",next:"n4",cards:["c-rsbi"]}]},
+   n4:{mon:{hr:90,bp:"128/72",spo2:95,pp:"13",vent:"PSV · PS 8 · PEEP 5 · FiO₂ 0.40"},
+    text:"He passed. He was intubated on the first attempt with a 7.5 tube 4 days ago, with no airway trauma.",
+    q:"Does he need a cuff leak test?",
+    c:[
+     {t:"Not routinely; save it for patients at high risk of post-extubation stridor",g:"best",fb:"Guidelines suggest a cuff leak test for high-risk patients (traumatic intubation, > 6 days, large tube, female sex, reintubation after unplanned extubation). No leak but otherwise ready: systemic steroids at least 4 h before extubation, without retesting.",next:"n5",cards:["c-cuffleak"]},
+     {t:"Yes, everyone needs one before extubation",g:"bad",fb:"Not required for everyone. Low-risk patients can be extubated without it.",next:"n5",cards:["c-cuffleak"]},
+     {t:"Skip the test and give everyone steroids",g:"bad",fb:"Steroids are for high-risk patients who fail a cuff leak test.",next:"n5",cards:["c-cuffleak"]}]},
+   n5:{mon:{hr:90,bp:"128/72",spo2:95,pp:"13",vent:"PSV · PS 8 · PEEP 5 · FiO₂ 0.40"},
+    text:"He has COPD and was hypercapnic when intubated.",
+    q:"What support after extubation?",
+    c:[
+     {t:"Extubate directly to NIV (high-flow between sessions is reasonable)",g:"best",fb:"ACCP/ATS suggest preventive NIV right after extubation in high-risk patients, with the clearest benefit in hypercapnia. HIGH-WEAN: high-flow plus NIV cut day-7 reintubation vs high-flow alone (11.8% vs 18.2%).",next:null,cards:["c-postext"]},
+     {t:"Nasal cannula 2 L and observe",g:"ok",fb:"Fine for low-risk patients. COPD and hypercapnia make him high risk, where preventive NIV helps.",next:null,cards:["c-postext"]},
+     {t:"Wait another 24 hours to be safe",g:"bad",fb:"Unnecessary delay adds ventilator days, pneumonia risk, and delirium.",next:null,cards:["c-satsbt"]}]}
+  },
+  debrief:["Daily paired SAT and SBT, run by protocol.","First SBT: pressure support 5–8 for 30 minutes (T-piece is an alternative).","RSBI < 105 supports readiness; clinical tolerance decides.","Cuff leak test only for high-risk patients; steroids at least 4 h before extubation if there's no leak.","High risk (age > 65, COPD, heart disease, hypercapnia): extubate to NIV, with or without high-flow."],
+  refs:["abc","ouellette17","girard17","subira","yang","thille","padis"]},
+
+ {id:"ptx",topic:"trouble",title:"Desaturation after a line",teaser:"Pressures jump right after a subclavian line. Then, two days later, a quieter problem.",mins:3,
+  nodes:{
+   start:{mon:{hr:136,bp:"84/50",spo2:80,pp:"52 / 46",vent:"VC · Vt 380 · RR 28 · PEEP 12 · FiO₂ 0.50"},
+    text:"48-year-old man with ARDS, day 3. Ten minutes after a left subclavian central line, SpO₂ drops to 80% and BP to 84/50. Peak went from 32 to 52; plateau from 26 to 46. Breath sounds are absent on the left.",
+    q:"What does the pressure pattern tell you?",
+    c:[
+     {t:"Peak and plateau rose together (same gap): compliance fell",g:"best",fb:"Peak minus plateau is 6 cm H₂O, same as before. The respiratory system got stiffer: pneumothorax, mainstem intubation, lobar collapse, edema, or abdominal distension.",next:"n2",cards:["c-pplat-high"]},
+     {t:"A resistance problem; suction him",g:"bad",fb:"With a resistance problem, plateau would stay near 26. It jumped to 46.",next:"n2",cards:["c-ppeak-pplat","c-pplat-high"]}]},
+   n2:{mon:{hr:138,bp:"80/48",spo2:79,pp:"52 / 46",vent:"VC · Vt 380 · RR 28 · PEEP 12 · FiO₂ 1.0"},
+    text:"Trachea is now shifted to the right.",
+    q:"Next step?",
+    c:[
+     {t:"Immediate needle decompression or finger thoracostomy on the left, then a chest tube",g:"best",fb:"Tension pneumothorax on positive pressure is a clinical diagnosis: hypotension, unilateral absent breath sounds, rising plateau, recent procedure. Don't wait for imaging.",next:"n3",cards:["c-tension"]},
+     {t:"Stat chest X-ray to confirm first",g:"bad",fb:"Waiting for imaging in an unstable ventilated patient risks arrest.",next:"n3",cards:["c-tension"]},
+     {t:"Raise PEEP to recruit the left lung",g:"bad",fb:"More intrathoracic pressure worsens tension physiology.",next:"n3",cards:["c-tension"]}]},
+   n3:{mon:{hr:98,bp:"112/66",spo2:89,pp:"37 / 31",vent:"VC · Vt 380 · RR 28 · PEEP 12 · FiO₂ 0.50"},
+    text:"Chest tube in; he stabilizes. Two days later, after a turn, SpO₂ drifts to 89% and plateau rises from 26 to 31. Left breath sounds are diminished; BP is fine. The tube reads 27 cm at the lip (documented 23 cm).",
+    q:"Most likely problem and fix?",
+    c:[
+     {t:"Right mainstem intubation: pull the tube back to the documented depth and confirm with exam and imaging",g:"best",fb:"Tubes migrate during turns. A 4 cm advance can enter the right mainstem, overinflating the right lung while the left collapses.",next:null,cards:["c-mainstem"]},
+     {t:"Recurrent pneumothorax: place a second chest tube",g:"bad",fb:"Check the simple things first. The tube depth changed by 4 cm.",next:null,cards:["c-mainstem"]},
+     {t:"Raise PEEP to 16",g:"bad",fb:"Doesn't fix the displaced tube and adds pressure to the right lung.",next:null,cards:["c-mainstem"]}]}
+  },
+  debrief:["Both pressures up with the same gap: compliance problem. Wider gap: resistance problem.","Ventilated patient + hypotension + unilateral breath sounds after a procedure = tension pneumothorax until proven otherwise.","Check and document tube depth at the lip every shift and after every move."],
+  refs:["phys"]}
+];
+
+const QUESTIONS = [
+ {id:"q1",topic:"basics",stem:"A 72-year-old woman, 157 cm and 92 kg, is intubated for ARDS after aspiration. Which initial tidal volume best follows lung-protective guidance?",opts:["560 mL","480 mL","420 mL","300 mL","220 mL"],ans:3,
+  ex:"PBW (female) = 45.5 + 0.91 × (157 − 152.4) ≈ 49.7 kg, so 6 mL/kg ≈ 300 mL. Actual weight doesn't matter because lungs scale with height. 560 mL is about 6 mL/kg of actual weight, a common error.",refs:["ardsnet","fan17"],cards:["c-pbw","c-lowvt"]},
+ {id:"q2",topic:"trouble",stem:"A ventilated patient with pneumonia triggers a high-pressure alarm. Peak 46 cm H₂O (baseline 30); plateau on inspiratory hold 20 (baseline 19). SpO₂ 90%. What is the most appropriate next step?",opts:["Needle decompression of the chest","Pass a suction catheter through the endotracheal tube","Increase PEEP","Furosemide IV","CT pulmonary angiogram"],ans:1,
+  ex:"Peak rose while plateau stayed flat, so resistance increased: secretions, plug, kink, biting, or bronchospasm. Suctioning tests tube patency and treats the most common cause. Pneumothorax and edema would raise plateau.",refs:["phys"],cards:["c-ppeak-pplat","c-dope"]},
+ {id:"q3",topic:"ards",stem:"ARDS on volume control: Vt 6 mL/kg PBW, RR 26, PEEP 14, FiO₂ 0.5. Plateau 27. ABG 7.19 / PaCO₂ 66 / PaO₂ 78. No auto-PEEP on expiratory hold. Best next step?",opts:["Increase Vt to 8 mL/kg","Increase RR to 34","Start a bicarbonate infusion","Decrease PEEP to 8","Start inhaled epoprostenol"],ans:1,
+  ex:"The ARMA protocol raises rate (up to 35) for acidosis before touching tidal volume. Without auto-PEEP, a faster rate is safe. Increasing Vt risks plateau > 30. Bicarbonate isn't first line.",refs:["ardsnet","fan17"],cards:["c-permissive","c-co2"]},
+ {id:"q4",topic:"ards",stem:"After 12 hours of optimized lung-protective ventilation (Vt 6 mL/kg, PEEP 16, FiO₂ 0.7), a patient with ARDS has PaO₂ 80 (P/F 114) and plateau 28. Which intervention has shown a mortality benefit here?",opts:["Prone positioning ≥ 12 h/day","Inhaled nitric oxide","High-frequency oscillatory ventilation","Prolonged recruitment maneuver at 40 cm H₂O","Routine pulmonary artery catheter"],ans:0,
+  ex:"PROSEVA (P/F < 150, FiO₂ ≥ 0.6, PEEP ≥ 5): 28-day mortality 16.0% vs 32.8% with early prolonged proning. Inhaled NO improves oxygenation without survival benefit; HFOV and prolonged recruitment maneuvers are recommended against.",refs:["proseva","fan17","ats24"],cards:["c-prone","c-rm"]},
+ {id:"q5",topic:"obstructive",stem:"A 66-year-old with severe COPD (home ABG: PaCO₂ 60, HCO₃ 34) is intubated for pneumonia. On VC Vt 500, RR 20, ABG is 7.58 / PaCO₂ 36 / HCO₃ 33. Best adjustment?",opts:["No change; PaCO₂ is normal","Decrease RR to target his baseline PaCO₂","Increase PEEP","Give acetazolamide","Increase Vt"],ans:1,
+  ex:"Normalizing PaCO₂ in a chronic retainer causes alkalemia, and the kidneys then excrete bicarbonate, setting him up to fail extubation. Target his baseline. A lower rate also lengthens expiratory time.",refs:["phys"],cards:["c-copd-co2"]},
+ {id:"q6",topic:"obstructive",stem:"Right after intubation for severe asthma with vigorous bag ventilation, BP falls from 128/80 to 70/40. Breath sounds are diminished bilaterally; trachea midline. Best immediate step?",opts:["Disconnect from the ventilator and allow passive exhalation","Increase RR","2 L crystalloid bolus","Bilateral chest tubes","Increase PEEP to 12"],ans:0,
+  ex:"Dynamic hyperinflation is the leading cause. Disconnecting for 30–60 s is diagnostic and therapeutic. Faster rate or more PEEP worsens trapping. Bilateral tension pneumothorax is rare; reassess if disconnection doesn't help.",refs:["phys"],cards:["c-autopeep"]},
+ {id:"q7",topic:"obstructive",stem:"A spontaneously breathing COPD patient on pressure support makes visible inspiratory efforts that fail to trigger the ventilator. Expiratory hold auto-PEEP is 8 cm H₂O with set PEEP 0. Which change most likely reduces missed triggers?",opts:["Increase pressure support","Apply external PEEP of about 6 cm H₂O","Make the trigger less sensitive","Increase sedation","Increase FiO₂"],ans:1,
+  ex:"The patient must overcome auto-PEEP before the ventilator senses effort. External PEEP at about 75–85% of auto-PEEP narrows that gap in flow-limited COPD. More pressure support can increase Vt and worsen trapping.",refs:["phys"],cards:["c-ext-peep"]},
+ {id:"q8",topic:"basics",stem:"A patient on pressure control (inspiratory pressure 15 above PEEP 10, RR 20) develops worsening pulmonary edema. What will the ventilator show?",opts:["Peak pressure rises; Vt unchanged","Peak pressure unchanged; Vt falls","Both peak pressure and Vt rise","Inspiratory flow rises","Plateau falls"],ans:1,
+  ex:"In pressure control, pressure is fixed and volume is the dependent variable. Lower compliance means less volume for the same pressure. In volume control it's the reverse: Vt fixed, pressures rise.",refs:["phys"],cards:["c-pc-vc"]},
+ {id:"q9",topic:"basics",stem:"In a multilevel analysis of ARDS trials (Amato 2015), which ventilator variable was most strongly associated with survival?",opts:["Tidal volume in mL/kg PBW","PEEP","Plateau pressure","Driving pressure (plateau − PEEP)","FiO₂"],ans:3,
+  ex:"Driving pressure (Vt normalized to compliance) best stratified risk. Changes in Vt or PEEP were beneficial only when they lowered driving pressure.",refs:["amato"],cards:["c-dp"]},
+ {id:"q10",topic:"liberation",stem:"Which finding during a 30-minute pressure support SBT should make you stop the trial?",opts:["RR 26 with Vt 400 mL","HR rising from 88 to 96","RR 38 with accessory muscle use and diaphoresis","SpO₂ 93% on FiO₂ 0.4","PaCO₂ 44"],ans:2,
+  ex:"Failure criteria include sustained RR > 35, SpO₂ < 90%, HR > 140 or a rise > 20%, SBP > 180 or < 90, and signs of distress such as accessory muscle use, diaphoresis, or agitation.",refs:["ouellette17"],cards:["c-sbt-fail"]},
+ {id:"q11",topic:"liberation",stem:"During an SBT: RR 32, Vt 250 mL. What is the RSBI and what does it suggest?",opts:["32; predicts success","78; predicts success","128; predicts failure","8; predicts failure","250; predicts failure"],ans:2,
+  ex:"RSBI = RR ÷ Vt in liters = 32 ÷ 0.25 = 128. Values above 105 predicted weaning failure in Yang and Tobin's study.",refs:["yang"],cards:["c-rsbi"]},
+ {id:"q12",topic:"liberation",stem:"Which patient is the best candidate for a cuff leak test before extubation?",opts:["55-year-old man, 2 days intubated, uneventful intubation","68-year-old woman intubated 8 days after a traumatic, multiple-attempt intubation","40-year-old man after elective surgery","Any patient with COPD","A patient with a tracheostomy"],ans:1,
+  ex:"Guidelines suggest a cuff leak test for patients at high risk of stridor: traumatic intubation, intubation > 6 days, large tube, female sex, reintubation after unplanned extubation. If there's no leak, give systemic steroids at least 4 h before extubation.",refs:["girard17"],cards:["c-cuffleak"]},
+ {id:"q13",topic:"niv",stem:"A 70-year-old with a COPD exacerbation: RR 30, ABG 7.28 / PaCO₂ 68 / PaO₂ 58 on 2 L. Alert and protecting his airway. Best next step?",opts:["High-flow nasal oxygen 60 L/min","Bilevel noninvasive ventilation","Immediate intubation","Non-rebreather mask","IV bicarbonate"],ans:1,
+  ex:"Bilevel NIV is strongly recommended for acute hypercapnic COPD exacerbation with pH ≤ 7.35. It lowers intubation and mortality. He has no contraindications.",refs:["niv17"],cards:["c-niv-strong","c-niv-contra"]},
+ {id:"q14",topic:"niv",stem:"In which setting does the ERS/ATS guideline make a strong recommendation for NIV?",opts:["De novo hypoxemic respiratory failure","Cardiogenic pulmonary edema","Asthma exacerbation","Post-extubation in low-risk patients","Chest trauma without hypoxemia"],ans:1,
+  ex:"Strong recommendations: hypercapnic COPD exacerbation (pH ≤ 7.35) and cardiogenic pulmonary edema. Conditional: immunocompromised, post-operative, palliation, chest trauma, high-risk post-extubation. No recommendation was made for asthma or de novo hypoxemic failure.",refs:["niv17"],cards:["c-niv-strong"]},
+ {id:"q15",topic:"niv",stem:"Which sedation approach for a mechanically ventilated adult does the SCCM PADIS guideline suggest?",opts:["Benzodiazepine infusion targeting RASS −4","Light sedation with propofol or dexmedetomidine rather than benzodiazepines","Routine deep sedation for the first 72 hours","Haloperidol as first-line sedative","Ketamine for all patients"],ans:1,
+  ex:"PADIS suggests analgesia-first, light sedation, and propofol or dexmedetomidine over benzodiazepines. Pair with daily awakening and breathing trials.",refs:["padis","abc"],cards:["c-padis"]},
+ {id:"q16",topic:"ards",stem:"On high-flow nasal oxygen 40 L/min, FiO₂ 0.6, SpO₂ 94%, a patient has new bilateral opacities from pneumonia without heart failure. Under the 2024 global ARDS definition, which is true?",opts:["Can't be ARDS without intubation","Meets ARDS criteria (SpO₂/FiO₂ ≈ 157, ≤ 315)","Requires CT to diagnose","Requires a P/F ratio; SpO₂ can't be used","Requires PEEP ≥ 10"],ans:1,
+  ex:"The global definition includes non-intubated patients on high-flow ≥ 30 L/min and accepts SpO₂/FiO₂ ≤ 315 when SpO₂ ≤ 97%. Here 94 ÷ 0.6 ≈ 157.",refs:["global24"],cards:["c-global"]},
+ {id:"q17",topic:"ards",stem:"Which therapy received a conditional recommendation FOR use in the 2024 ATS ARDS guideline update?",opts:["Routine high-frequency oscillatory ventilation","Corticosteroids","Prolonged high-pressure recruitment maneuvers","Inhaled nitric oxide for all patients","Liberal fluid strategy"],ans:1,
+  ex:"ATS 2024 suggests corticosteroids for ARDS, VV-ECMO for selected severe ARDS, NMB in early severe ARDS, and higher PEEP without prolonged recruitment maneuvers in moderate to severe ARDS.",refs:["ats24"],cards:["c-steroids","c-ecmo"]}
+];
+
+/* ================= SIM PATIENTS & MISSIONS ================= */
+const PATIENTS = {
+  normal:{name:"Overdose, normal lungs",sex:"M",cm:178,C:55,R:10,vd:190,vco2:230,hco3:24,shunt:.08,rec:.5,map0:82,hr0:88,trapVd:0},
+  ards:{name:"ARDS, septic shock",sex:"F",cm:163,C:24,R:12,vd:190,vco2:240,hco3:20,shunt:.5,rec:.55,map0:74,hr0:108,trapVd:0},
+  asthma:{name:"Status asthmaticus",sex:"M",cm:175,C:60,R:30,vd:220,vco2:250,hco3:22,shunt:.1,rec:.3,map0:80,hr0:110,trapVd:12},
+  copd:{name:"COPD, chronic hypercapnia",sex:"M",cm:170,C:60,R:22,vd:200,vco2:220,hco3:34,shunt:.12,rec:.3,map0:78,hr0:96,trapVd:0}
+};
+const MISSIONS = [
+ {id:"m-basic",title:"Set up a safe vent",pt:"normal",level:"Start here",
+  brief:"40-year-old man, 178 cm, intubated for airway protection after an overdose. Lungs are normal. The ED left him on Vt 700, RR 10, PEEP 0, FiO₂ 1.0. Make it safe.",
+  start:{mode:"VC",vt:700,rr:10,peep:0,flow:60,fio2:1,pinsp:15,ti:.9},
+  goals:[
+   {l:"Vt 6–8 mL/kg PBW",t:m=>m.vtkg>=5.95&&m.vtkg<=8.05,h:"PBW for a 178 cm man ≈ 73 kg, so 440–580 mL."},
+   {l:"PEEP at least 5",t:(m,s)=>s.peep>=5,h:"A little PEEP prevents derecruitment, even in normal lungs."},
+   {l:"FiO₂ ≤ 0.40 with SpO₂ ≥ 92%",t:(m,s)=>s.fio2<=.401&&m.spo2>=92,h:"Normal lungs don't need high FiO₂. Wean it."},
+   {l:"Plateau ≤ 30 (do an inspiratory hold)",need:"insp",t:m=>m.pplat<=30,h:"Tap Insp hold to measure plateau."},
+   {l:"pH 7.35–7.45 (draw an ABG)",need:"abg",t:m=>m.ph>=7.35&&m.ph<=7.45,h:"Smaller Vt lowers minute ventilation, so raise RR to keep CO₂ normal."}],
+  debrief:"Set Vt by height, not weight. Start PEEP 5, wean FiO₂ to a normal saturation, and adjust RR to the ABG. Minute ventilation (RR × Vt) controls CO₂.",cards:["c-pbw","c-co2","c-measure"],refs:["ardsnet","fan17"]},
+ {id:"m-ards",title:"Protect the ARDS lung",pt:"ards",level:"Core",
+  brief:"54-year-old woman, 163 cm, severe ARDS from pneumonia. She's on Vt 500, RR 14, PEEP 5, FiO₂ 0.6, saturating in the high 80s. Ventilate her like the ARDSNet protocol.",
+  start:{mode:"VC",vt:500,rr:14,peep:5,flow:60,fio2:.6,pinsp:18,ti:.8},
+  goals:[
+   {l:"Vt 4–6.5 mL/kg PBW",t:m=>m.vtkg>=4&&m.vtkg<=6.55,h:"PBW ≈ 55 kg, so aim near 330 mL."},
+   {l:"SpO₂ 88–95% on FiO₂ ≤ 0.60",t:(m,s)=>m.spo2>=88&&m.spo2<=95.5&&s.fio2<=.601,h:"Raise PEEP to recruit lung, then trim FiO₂."},
+   {l:"Plateau ≤ 30 (inspiratory hold)",need:"insp",t:m=>m.pplat<=30,h:"Plateau = PEEP + Vt ÷ compliance."},
+   {l:"Driving pressure ≤ 15 (inspiratory hold)",need:"insp",t:m=>m.dp<=15,h:"Driving pressure = plateau − PEEP. Lower Vt lowers it."},
+   {l:"pH 7.25–7.45 (draw an ABG)",need:"abg",t:m=>m.ph>=7.25&&m.ph<=7.45,h:"Low Vt raises CO₂. Increase RR, up to 35."}],
+  debrief:"Low tidal volume plus higher PEEP: plateau and driving pressure stay safe, PEEP recruits lung so FiO₂ can come down, and a faster rate offsets the smaller breaths. Try pressure control too: set pressure and time, and watch Vt change.",cards:["c-lowvt","c-peep","c-dp","c-permissive","c-pc-vc"],refs:["ardsnet","fan17","amato"]},
+ {id:"m-asthma",title:"Let the asthmatic exhale",pt:"asthma",level:"Core",
+  brief:"28-year-old man, 175 cm, intubated for status asthmaticus. BP is falling. He's on Vt 600, RR 30, PEEP 5, flow 50 L/min. Watch the flow trace: it never returns to zero.",
+  start:{mode:"VC",vt:600,rr:30,peep:5,flow:50,fio2:.5,pinsp:20,ti:.8},
+  goals:[
+   {l:"Auto-PEEP ≤ 5 (expiratory hold)",need:"exp",t:m=>m.ai<=5,h:"Lower the RR first. It's the biggest lever on expiratory time."},
+   {l:"Plateau ≤ 30 (inspiratory hold)",need:"insp",t:m=>m.pplat<=30,h:"Trapped air raises plateau as well."},
+   {l:"MAP ≥ 65",t:m=>m.map>=65,h:"Hyperinflation squeezes venous return. Less trapping, better BP."},
+   {l:"pH ≥ 7.15 (draw an ABG)",need:"abg",t:m=>m.ph>=7.15,h:"Permissive hypercapnia is fine, within limits."}],
+  debrief:"Expiratory time is the treatment. Low RR, modest Vt, and high inspiratory flow give the lungs time to empty. Higher peak pressure from fast flow is acceptable when plateau and auto-PEEP are low.",cards:["c-te","c-autopeep","c-ie","c-measure"],refs:["phys"]},
+ {id:"m-copd",title:"Don't over-ventilate COPD",pt:"copd",level:"Advanced",
+  brief:"66-year-old man, 170 cm, severe COPD with chronic hypercapnia (home PaCO₂ about 60, HCO₃ 34). Intubated for pneumonia on Vt 550, RR 22. Draw an ABG and match his baseline.",
+  start:{mode:"VC",vt:550,rr:22,peep:5,flow:60,fio2:.4,pinsp:16,ti:.9},
+  goals:[
+   {l:"Vt 6–8 mL/kg PBW",t:m=>m.vtkg>=5.95&&m.vtkg<=8.05,h:"PBW ≈ 66 kg: about 400–530 mL."},
+   {l:"Auto-PEEP ≤ 5 (expiratory hold)",need:"exp",t:m=>m.ai<=5,h:"Fewer breaths means more time to exhale."},
+   {l:"pH 7.32–7.42 (draw an ABG)",need:"abg",t:m=>m.ph>=7.32&&m.ph<=7.42,h:"His normal PaCO₂ is about 60. A PaCO₂ of 40 makes him alkalemic."}],
+  debrief:"Target the patient's baseline, not textbook numbers. Over-ventilating a chronic retainer causes alkalemia, then bicarbonate loss, then failure at extubation when his CO₂ climbs back.",cards:["c-copd-co2","c-te"],refs:["phys"]}
+];
+
+/* ================= PHYSIOLOGY MODEL ================= */
+function pbw(sex,cm){return (sex==="M"?50:45.5)+0.91*(cm-152.4)}
+function sevSat(p){p=Math.max(p,1);return 1/(23400/(p*p*p+150*p)+1)}
+function physio(pt,s){
+  const C=pt.C,R=pt.R,tau=R*C/1000,ttot=60/s.rr;
+  let ti,vt,ai=0,flowLs=0,trap=0;
+  if(s.mode==="VC"){flowLs=s.flow/60;vt=s.vt;ti=(vt/1000)/flowLs}else{ti=s.ti;vt=0}
+  let te=ttot-ti;const inverse=te<ti;te=Math.max(te,0.25);
+  const k=Math.exp(-te/tau);
+  if(s.mode==="VC"){trap=vt*k/(1-k);ai=trap/C}
+  else{for(let i=0;i<40;i++){vt=C*Math.max(0,s.pinsp-ai)*(1-Math.exp(-ti/tau));trap=vt*k/(1-k);ai=trap/C}}
+  const peepTot=s.peep+ai,pplat=peepTot+vt/C;
+  const ppeak=s.mode==="VC"?pplat+R*flowLs:s.peep+s.pinsp;
+  const peakFlow=s.mode==="VC"?s.flow:(C*Math.max(0,s.pinsp-ai)/1000/tau)*60;
+  const vd=pt.vd+Math.max(0,pplat-30)*4+pt.trapVd*ai;
+  const va=Math.max(0.3,s.rr*Math.max(vt-vd,15)/1000);
+  const paco2=Math.min(150,0.863*pt.vco2/va);
+  const hco3=pt.hco3+0.1*(paco2-40);
+  const ph=6.1+Math.log10(hco3/(0.03*paco2));
+  let qs=pt.shunt*(1-pt.rec*(1-Math.exp(-peepTot/7)))+Math.max(0,pplat-30)*0.006;
+  qs=Math.min(0.65,Math.max(0.02,qs));
+  const pA=Math.max(30,s.fio2*713-paco2/0.8),hb=10;
+  const cc=1.34*hb*sevSat(pA)+0.003*pA,ca=cc-5*qs/(1-qs);
+  let lo=5,hi=700;for(let i=0;i<40;i++){const mid=(lo+hi)/2;if(1.34*hb*sevSat(mid)+0.003*mid>ca)hi=mid;else lo=mid}
+  const pao2=(lo+hi)/2,spo2=sevSat(pao2)*100;
+  const map=pt.map0-0.9*Math.max(0,peepTot-10)-3*Math.max(0,ai-4);
+  const hr=pt.hr0+Math.max(0,65-map)*0.9+(spo2<88?(88-spo2)*0.6:0);
+  return {vt,ti,te,tau,trap,ai,peepTot,pplat,ppeak,peakFlow,flowLs,dp:pplat-peepTot,paco2,ph,hco3,pao2,spo2,pf:pao2/s.fio2,map,hr,ve:vt*s.rr/1000,vtkg:vt/pbw(pt.sex,pt.cm),inverse,ttot,C,R};
+}
+
+/* ================= STORAGE (account sync + device fallback) ================= */
+const LS_KEY="plateau.v1";
+function blankState(){return {xp:0,streak:{last:null,count:0},cards:{},qs:{},cases:{},missions:{},newToday:{d:null,n:0},updatedAt:0}}
+let S=blankState();
+let syncMode="device";
+try{const raw=localStorage.getItem(LS_KEY);if(raw){S=Object.assign(blankState(),JSON.parse(raw))}}catch(e){}
+let cloudRef=null,cloudBusy=false,cloudQueued=false,cloudTimer=null;
+function save(){
+  S.updatedAt=Date.now();
+  try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}
+  if(cloudRef){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,1200)}
+}
+async function pushCloud(){
+  if(!cloudRef)return;
+  if(cloudBusy){cloudQueued=true;return}
+  cloudBusy=true;
+  try{await cloudRef.set(JSON.parse(JSON.stringify(S)));syncMode="account"}catch(e){syncMode="device"}
+  cloudBusy=false;renderHeader();
+  if(cloudQueued){cloudQueued=false;pushCloud()}
+}
+async function initCloud(){
+  try{
+    if(!(window.claude&&typeof window.claude.use==="function"))return;
+    const [user,db]=await Promise.all([window.claude.use("user"),window.claude.use("db")]);
+    if(!user||!db)return;
+    const id=await user.id();if(!id)return;
+    const ref=db.collection("data/users/"+id).doc("progress");
+    const snap=await Promise.race([ref.get(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),10000))]);
+    cloudRef=ref;syncMode="account";
+    if(snap.exists){const d=snap.data()||{};if((d.updatedAt||0)>(S.updatedAt||0)){S=Object.assign(blankState(),JSON.parse(JSON.stringify(d)));try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}route()}else if((S.updatedAt||0)>(d.updatedAt||0)){pushCloud()}}
+    else if(S.updatedAt){pushCloud()}
+    renderHeader();
+  }catch(e){syncMode="device";renderHeader()}
+}
+
+/* ================= PROGRESS HELPERS ================= */
+const LEVELS=[[0,"Intern"],[200,"Resident"],[600,"Senior resident"],[1200,"Fellow"],[2200,"Attending"],[3500,"Intensivist"]];
+function level(){let i=0;for(let j=0;j<LEVELS.length;j++)if(S.xp>=LEVELS[j][0])i=j;const next=LEVELS[i+1];return {name:LEVELS[i][1],next:next?next[0]:null,cur:LEVELS[i][0]}}
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function touchStreak(){const t=today();if(S.streak.last===t)return;const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");S.streak.count=S.streak.last===ys?S.streak.count+1:1;S.streak.last=t}
+function addXP(n){S.xp+=n;touchStreak();save();renderHeader()}
+const DAY=86400000,NEW_PER_DAY=10;
+function boostCards(ids,from){const now=Date.now();(ids||[]).forEach(id=>{if(!CARDS.find(c=>c.id===id))return;const st=S.cards[id]||{ivl:0,ef:2.5,reps:0,lapses:0};st.due=now;st.boost=from;S.cards[id]=st})}
+function newCount(){if(S.newToday.d!==today())return 0;return S.newToday.n}
+function reviewQueue(){
+  const now=Date.now();
+  const due=CARDS.filter(c=>S.cards[c.id]&&S.cards[c.id].due<=now).sort((a,b)=>(S.cards[b.id].boost?1:0)-(S.cards[a.id].boost?1:0)||S.cards[a.id].due-S.cards[b.id].due);
+  const fresh=CARDS.filter(c=>!S.cards[c.id]).slice(0,Math.max(0,NEW_PER_DAY-newCount()));
+  return due.concat(fresh);
+}
+function dueCount(){return reviewQueue().length}
+function nextIntervals(st){
+  st=st||{ivl:0,ef:2.5,reps:0};
+  const r=q=>{if(q===0)return 10/1440;if(st.reps===0)return q===3?1:q===4?1:3;if(st.reps===1)return q===3?2:q===4?3:5;return Math.max(1,Math.round(st.ivl*st.ef*(q===3?0.8:q===5?1.3:1)))};
+  return [0,3,4,5].map(r);
+}
+function grade(card,q){
+  const isNew=!S.cards[card.id];
+  const st=S.cards[card.id]||{ivl:0,ef:2.5,reps:0,lapses:0};
+  const [a,h,g,e]=nextIntervals(st);
+  if(q===0){st.reps=0;st.ivl=0;st.lapses=(st.lapses||0)+1;st.due=Date.now()+10*60000}
+  else{st.ivl=q===3?h:q===4?g:e;st.ef=Math.max(1.3,st.ef+0.1-(5-q)*(0.08+(5-q)*0.02));st.reps++;st.due=Date.now()+st.ivl*DAY}
+  delete st.boost;S.cards[card.id]=st;
+  if(isNew){if(S.newToday.d!==today())S.newToday={d:today(),n:0};S.newToday.n++}
+  addXP(q===0?1:2);
+}
+function fmtIvl(d){if(d<1)return Math.round(d*1440)+"m";if(d<30)return Math.round(d)+"d";return Math.round(d/30)+"mo"}
+function mastery(topic){
+  const sig=[];
+  const qs=QUESTIONS.filter(q=>q.topic===topic);
+  if(qs.length){const ans=qs.filter(q=>S.qs[q.id]);if(ans.length)sig.push(ans.filter(q=>S.qs[q.id].first).length/qs.length)}
+  const cs=CASES.filter(c=>c.topic===topic);
+  if(cs.length){const done=cs.filter(c=>S.cases[c.id]);if(done.length)sig.push(cs.reduce((a,c)=>a+((S.cases[c.id]&&S.cases[c.id].best)||0),0)/100/cs.length)}
+  const cd=CARDS.filter(c=>c.topic===topic);
+  if(cd.length){const seen=cd.filter(c=>S.cards[c.id]&&S.cards[c.id].reps>0);if(seen.length)sig.push(cd.reduce((a,c)=>a+Math.min(1,((S.cards[c.id]&&S.cards[c.id].ivl)||0)/21),0)/cd.length)}
+  return sig.length?sig.reduce((a,b)=>a+b,0)/sig.length:0;
+}
+
+/* ================= UI HELPERS ================= */
+const $=(s,el=document)=>el.querySelector(s);
+const view=$("#view");
+const ICONS={
+ home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/>',
+ sim:'<path d="M2 15h4l2.5-8 3 12 3-9 1.5 5H22"/>',
+ cases:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4M8.5 10h7M8.5 14h5"/>',
+ qs:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>',
+ review:'<rect x="3" y="7" width="14" height="13" rx="2"/><path d="M7 4h12a2 2 0 0 1 2 2v11"/>'
+};
+const icon=(n,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+function toast(msg){const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+function refList(keys){return `<ul class="refs">${keys.map(k=>{const s=SOURCES[k];if(!s)return"";return `<li>${s.pmid?`<a class="pm" href="https://pubmed.ncbi.nlm.nih.gov/${s.pmid}/" target="_blank" rel="noopener">PMID ${s.pmid}</a>`:`<span class="pm none">Physiology</span>`}<span><b>${s.title}.</b> <span class="muted">${s.cite}</span></span></li>`}).join("")}</ul>`}
+function linkLabel(l){if(!l)return"";if(l.t==="case"){const c=CASES.find(x=>x.id===l.id);return c?{href:"#case-"+c.id,txt:"Case: "+c.title}:""}if(l.t==="mission"){const m=MISSIONS.find(x=>x.id===l.id);return m?{href:"#sim-"+m.id,txt:"Simulator: "+m.title}:""}if(l.t==="q"){return {href:"#questions-"+l.id,txt:"Question "+l.id.slice(1)}}return""}
+function sheet(html){const b=document.createElement("div");b.className="sheet-back";b.innerHTML=`<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;b.addEventListener("click",e=>{if(e.target===b||e.target.closest("[data-close]"))b.remove()});document.body.appendChild(b);return b}
+
+function renderHeader(){
+  const L=level();
+  $("#lvl").innerHTML=`<b>${L.name}</b> · ${S.xp} XP<br>${syncMode==="account"?"Synced to your account":"Saved on this device"}`;
+  const tabs=[["home","Today","home"],["sim","Simulator","sim"],["cases","Cases","cases"],["questions","Questions","qs"],["review","Review","review"]];
+  const cur=(location.hash.slice(1)||"home").split("-")[0];
+  const dc=dueCount();
+  $("#tabs").innerHTML=tabs.map(([h,l,i])=>`<button class="tab" data-go="${h}" ${cur===h||(h==="cases"&&cur==="case")?'aria-current="page"':""}>${icon(i)}${l}${h==="review"&&dc?`<span class="badge">${dc}</span>`:""}</button>`).join("");
+}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){location.hash=g.dataset.go}});
+
+/* ================= ROUTER ================= */
+function route(){
+  stopWave();
+  const h=location.hash.slice(1)||"home";
+  const [base,...rest]=h.split("-");const arg=rest.join("-");
+  renderHeader();window.scrollTo(0,0);
+  if(base==="sim")return renderSim(arg?"m-"+arg.replace(/^m-/,""):null);
+  if(base==="cases")return renderCases();
+  if(base==="case")return renderCase(arg);
+  if(base==="questions")return renderQuestions(arg||null);
+  if(base==="review")return renderReview();
+  if(base==="sources")return renderSources();
+  return renderHome();
+}
+window.addEventListener("hashchange",route);
+
+/* ================= HOME ================= */
+function renderHome(){
+  const hr=new Date().getHours();const greet=hr>=19||hr<6?"Night shift":hr<12?"Good morning":"Good afternoon";
+  const dc=dueCount();
+  const nextCase=CASES.find(c=>!S.cases[c.id])||CASES.slice().sort((a,b)=>(S.cases[a.id].best||0)-(S.cases[b.id].best||0))[0];
+  const nextMission=MISSIONS.find(m=>!S.missions[m.id])||MISSIONS[0];
+  const qAns=QUESTIONS.filter(q=>S.qs[q.id]);const qAcc=qAns.length?Math.round(100*qAns.filter(q=>S.qs[q.id].first).length/qAns.length):null;
+  const L=level();const pct=L.next?Math.round(100*(S.xp-L.cur)/(L.next-L.cur)):100;
+  view.innerHTML=`<section class="screen stack-lg">
+    <div class="hero"><span class="eyebrow">${greet}</span><h1>Practice the decisions you make at the bedside.</h1><p class="muted">Short sessions: a few cards, one case, one vent to fix.</p></div>
+    <div class="stats">
+      <div class="stat"><div class="v mono">${S.streak.count||0}</div><div class="k">Day streak</div></div>
+      <div class="stat"><div class="v mono">${qAcc===null?"--":qAcc+"%"}</div><div class="k">First-try accuracy</div></div>
+      <div class="stat"><div class="v mono">${S.xp}</div><div class="k">${L.name}${L.next?` · ${pct}% to next`:""}</div></div>
+    </div>
+    <div class="panel"><div class="eyebrow" style="margin-bottom:4px">Your plan for this shift</div><div class="plan">
+      <a href="#review"><span class="ic">${icon("review")}</span><span class="tx"><b>${dc?`Review ${dc} card${dc>1?"s":""}`:"Reviews done for now"}</b><span>${dc?"Includes cards linked to anything you missed":"New cards unlock tomorrow"}</span></span></a>
+      <a href="#case-${nextCase.id}"><span class="ic">${icon("cases")}</span><span class="tx"><b>${nextCase.title}</b><span>${S.cases[nextCase.id]?`Best ${S.cases[nextCase.id].best}%. Replay to improve`:`Case · about ${nextCase.mins} min`}</span></span></a>
+      <a href="#sim-${nextMission.id.slice(2)}"><span class="ic">${icon("sim")}</span><span class="tx"><b>${nextMission.title}</b><span>Simulator · ${PATIENTS[nextMission.pt].name}</span></span></a>
+      <a href="#questions"><span class="ic">${icon("qs")}</span><span class="tx"><b>Board-style questions</b><span>${qAns.length} of ${QUESTIONS.length} answered</span></span></a>
+    </div></div>
+    <div class="stack"><h2>Mastery</h2><div class="panel mastery">${Object.entries(TOPICS).map(([k,v])=>{const m=Math.round(100*mastery(k));return `<div class="mrow"><span>${v}</span><div class="bar"><i style="width:${m}%"></i></div><span class="mono muted" style="text-align:right">${m}%</span></div>`}).join("")}</div></div>
+    <a class="trust" href="#sources" style="text-decoration:none"><span class="pill acc">v${CONTENT_VERSION}</span><span>Content checked against ${Object.values(SOURCES).filter(s=>s.pmid).length} guidelines and trials, last reviewed ${new Date(REVIEWED+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}. Next guideline scan ${NEXT_SCAN}.</span></a>
+  </section>`;
+}
+
+/* ================= CASES ================= */
+function renderCases(){
+  view.innerHTML=`<section class="screen stack-lg"><div class="hero"><span class="eyebrow">Bedside cases</span><h1>Make the call, see what happens.</h1><p class="muted">Every decision is scored. Anything you miss becomes a review card linked back to this moment.</p></div>
+  <div class="clist">${CASES.map(c=>{const r=S.cases[c.id];return `<a class="ccard" href="#case-${c.id}"><div class="meta"><span class="pill">${TOPICS[c.topic]}</span>${r?`<span class="pill ${r.best>=80?"good":r.best>=50?"warn":"crit"}">Best ${r.best}%</span>`:`<span class="mono muted" style="font-size:12px">${c.mins} min</span>`}</div><h3>${c.title}</h3><p>${c.teaser}</p></a>`}).join("")}</div></section>`;
+}
+let CS=null;
+function renderCase(id){
+  const c=CASES.find(x=>x.id===id);if(!c)return renderCases();
+  if(!CS||CS.id!==id||CS.done)CS={id,node:"start",score:0,max:0,steps:0,picked:null,done:false,missed:[]};
+  drawCase(c);
+}
+function vitals(mon){return `<div class="vitals"><div class="hr"><div class="k">HR</div><div class="v">${mon.hr}</div></div><div class="bp"><div class="k">BP</div><div class="v">${mon.bp}</div></div><div class="sp"><div class="k">SpO₂</div><div class="v">${mon.spo2}%</div></div><div class="pp"><div class="k">Peak/Plat</div><div class="v">${mon.pp}</div></div><div class="ventline">${mon.vent}</div></div>`}
+function drawCase(c){
+  const n=c.nodes[CS.node];const total=Object.keys(c.nodes).length;
+  const picked=CS.picked;
+  view.innerHTML=`<section class="screen stack">
+    <div class="row" style="justify-content:space-between"><a href="#cases" class="muted" style="text-decoration:none;font-weight:600">← Cases</a><span class="mono muted" style="font-size:12px">Decision ${CS.steps+1} of ${total}</span></div>
+    <div class="progress"><i style="width:${100*CS.steps/total}%"></i></div>
+    <h2>${c.title}</h2>
+    ${vitals(n.mon)}
+    <p class="narr">${n.text}</p>
+    <h3>${n.q}</h3>
+    <div class="choices">${n.c.map((ch,i)=>{let cls="";if(picked!==null){if(i===picked)cls="sel-"+ch.g;else if(ch.g==="best")cls="is-correct";else cls="dim"}return `<button class="choice ${cls}" data-ch="${i}" ${picked!==null?"disabled":""}><span class="key">${"ABCD"[i]}</span><span>${ch.t}</span></button>`}).join("")}</div>
+    ${picked!==null?(()=>{const ch=n.c[picked];const lab={best:["good","Best choice"],ok:["warn","Reasonable, not best"],bad:["crit","Not this"]}[ch.g];return `<div class="fb"><span class="pill ${lab[0]}">${lab[1]}</span><p>${ch.fb}</p>${ch.g!=="best"?`<p class="muted" style="font-size:14px">Best answer: ${n.c.find(x=>x.g==="best").fb}</p>`:""}</div><button class="btn primary block" id="next">${ch.next?"Continue":"See debrief"}</button>`})():""}
+  </section>`;
+  view.querySelectorAll("[data-ch]").forEach(b=>b.addEventListener("click",()=>{
+    const i=+b.dataset.ch,ch=n.c[i];CS.picked=i;CS.max+=10;CS.score+=ch.g==="best"?10:ch.g==="ok"?5:0;
+    if(ch.g!=="best"){const ids=[...(ch.cards||[]),...n.c.filter(x=>x.g==="best").flatMap(x=>x.cards||[])];boostCards(ids,"Case: "+c.title);CS.missed.push(...ids)}
+    addXP(ch.g==="best"?10:ch.g==="ok"?4:1);drawCase(c);
+    const fb=$(".fb");if(fb)fb.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+  }));
+  const nx=$("#next");if(nx)nx.addEventListener("click",()=>{const ch=n.c[CS.picked];CS.steps++;CS.picked=null;if(ch.next){CS.node=ch.next;drawCase(c);window.scrollTo(0,0)}else finishCase(c)});
+}
+function finishCase(c){
+  const pct=Math.round(100*CS.score/CS.max);const prev=S.cases[c.id];
+  S.cases[c.id]={best:Math.max(pct,prev?prev.best:0),last:pct,plays:(prev?prev.plays:0)+1};
+  if(!prev)addXP(30);else save();
+  CS.done=true;const missed=[...new Set(CS.missed)];
+  window.scrollTo(0,0);
+  view.innerHTML=`<section class="screen stack-lg">
+    <div class="row" style="justify-content:space-between"><a href="#cases" class="muted" style="text-decoration:none;font-weight:600">← Cases</a><span class="pill ${pct>=80?"good":pct>=50?"warn":"crit"}">${pct>=80?"Strong":pct>=50?"Getting there":"Replay this one"}</span></div>
+    <div class="row" style="gap:18px;align-items:flex-end"><div class="score mono">${pct}%</div><div><h2>${c.title}</h2><p class="muted">${CS.score} of ${CS.max} points${prev?` · previous best ${prev.best}%`:""}</p></div></div>
+    <div class="panel stack"><h3>Debrief</h3><ul class="points">${c.debrief.map(p=>`<li>${p}</li>`).join("")}</ul></div>
+    ${missed.length?`<div class="panel stack"><h3>Added to your review</h3><p class="muted" style="font-size:14.5px">${missed.length} card${missed.length>1?"s are":" is"} now due, each linked back to this case.</p><a class="btn ghost" href="#review">Review now</a></div>`:""}
+    <div class="stack"><h3>Evidence</h3>${refList(c.refs)}</div>
+    <div class="row"><button class="btn primary" id="again">Replay case</button><a class="btn ghost" href="#cases">All cases</a></div>
+  </section>`;
+  $("#again").addEventListener("click",()=>{CS=null;renderCase(c.id)});
+}
+
+/* ================= QUESTIONS ================= */
+let QF="all",QCUR=null,QPICK=null;
+function pickQuestion(){
+  const pool=QUESTIONS.filter(q=>QF==="all"||q.topic===QF);
+  const un=pool.filter(q=>!S.qs[q.id]);if(un.length)return un[0];
+  const wrong=pool.filter(q=>S.qs[q.id]&&!S.qs[q.id].lastOk);if(wrong.length)return wrong[0];
+  return pool.slice().sort((a,b)=>(S.qs[a.id].at||0)-(S.qs[b.id].at||0))[0];
+}
+function renderQuestions(qid){
+  if(qid){const q=QUESTIONS.find(x=>x.id===qid);if(q){QCUR=q;QPICK=null}}
+  if(!QCUR||(QF!=="all"&&QCUR.topic!==QF)){QCUR=pickQuestion();QPICK=null}
+  const q=QCUR;const pool=QUESTIONS.filter(x=>QF==="all"||x.topic===QF);const ans=pool.filter(x=>S.qs[x.id]);const ok=ans.filter(x=>S.qs[x.id].first).length;
+  view.innerHTML=`<section class="screen stack">
+    <div class="hero"><span class="eyebrow">Question bank</span><h1>Board-style vignettes</h1></div>
+    <div class="chips" role="group" aria-label="Filter by topic">${[["all","All"],...Object.entries(TOPICS)].map(([k,v])=>`<button class="chip" data-f="${k}" aria-pressed="${QF===k}">${v}</button>`).join("")}</div>
+    <p class="mono muted" style="font-size:12.5px">${ans.length} of ${pool.length} answered · ${ans.length?Math.round(100*ok/ans.length):0}% first-try correct</p>
+    <div class="panel stack">
+      <div class="row" style="justify-content:space-between"><span class="pill">${TOPICS[q.topic]}</span><span class="mono muted" style="font-size:12px">Q${q.id.slice(1)}${S.qs[q.id]?` · seen ${S.qs[q.id].n}×`:""}</span></div>
+      <p class="narr">${q.stem}</p>
+      <div class="choices">${q.opts.map((o,i)=>{let cls="";if(QPICK!==null){if(i===q.ans)cls="is-correct";else if(i===QPICK)cls="is-wrong";else cls="dim"}return `<button class="choice ${cls}" data-o="${i}" ${QPICK!==null?"disabled":""}><span class="key">${"ABCDE"[i]}</span><span>${o}</span></button>`}).join("")}</div>
+      ${QPICK!==null?`<div class="fb"><span class="pill ${QPICK===q.ans?"good":"crit"}">${QPICK===q.ans?"Correct":"Incorrect · answer "+"ABCDE"[q.ans]}</span><p>${q.ex}</p>${QPICK!==q.ans?`<p class="muted" style="font-size:14px">${q.cards.length} linked card${q.cards.length>1?"s":""} added to your review.</p>`:""}</div>${refList(q.refs)}<button class="btn primary block" id="nextq">Next question</button>`:""}
+    </div></section>`;
+  view.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{QF=b.dataset.f;QCUR=null;QPICK=null;renderQuestions()}));
+  view.querySelectorAll("[data-o]").forEach(b=>b.addEventListener("click",()=>{
+    QPICK=+b.dataset.o;const ok=QPICK===q.ans;const prev=S.qs[q.id];
+    S.qs[q.id]={first:prev?prev.first:ok,lastOk:ok,n:(prev?prev.n:0)+1,at:Date.now()};
+    if(!ok)boostCards(q.cards,"Question "+q.id.slice(1));
+    addXP(ok?(prev?3:10):1);renderQuestions();
+  }));
+  const nq=$("#nextq");if(nq)nq.addEventListener("click",()=>{const cur=QCUR;QPICK=null;QCUR=null;let n=pickQuestion();if(n===cur){const pool=QUESTIONS.filter(x=>QF==="all"||x.topic===QF);n=pool[(pool.indexOf(cur)+1)%pool.length]}QCUR=n;if(location.hash!=="#questions")history.replaceState(null,"","#questions");renderQuestions();window.scrollTo(0,0)});
+}
+
+/* ================= REVIEW ================= */
+let RV={card:null,shown:false};
+function renderReview(){
+  const q=reviewQueue();
+  if(!RV.card||!q.includes(RV.card)){RV.card=q[0]||null;RV.shown=false}
+  const c=RV.card;
+  if(!c){const upcoming=CARDS.filter(x=>S.cards[x.id]).map(x=>S.cards[x.id].due).sort((a,b)=>a-b)[0];
+    view.innerHTML=`<section class="screen stack-lg"><div class="hero"><span class="eyebrow">Spaced review</span><h1>You're caught up.</h1><p class="muted">${upcoming?`Next card due ${new Date(upcoming).toLocaleString(undefined,{weekday:"short",hour:"numeric",minute:"2-digit"})}.`:""} Missed questions and case decisions add linked cards here automatically.</p></div><div class="row"><a class="btn primary" href="#cases">Play a case</a><a class="btn ghost" href="#questions">Answer questions</a></div></section>`;return}
+  const st=S.cards[c.id];const iv=nextIntervals(st);const ln=linkLabel(c.link);
+  view.innerHTML=`<section class="screen stack">
+    <div class="row" style="justify-content:space-between"><span class="eyebrow">Spaced review</span><span class="mono muted" style="font-size:12.5px">${q.length} left today</span></div>
+    <div class="panel flash">
+      <div class="stack" style="gap:10px">
+        <div class="row" style="justify-content:space-between"><span class="pill">${TOPICS[c.topic]}</span>${st&&st.boost?`<span class="pill crit">Missed in ${st.boost}</span>`:!st?`<span class="pill acc">New</span>`:""}</div>
+        <div class="front">${c.f}</div>
+        ${RV.shown?`<div class="back">${c.b}</div>`:""}
+      </div>
+      ${RV.shown?`<div class="stack" style="gap:8px">${ln?`<div class="linked">Practice it: <a href="${ln.href}">${ln.txt}</a></div>`:""}${refList(c.src)}</div>`:""}
+    </div>
+    ${RV.shown?`<div class="grades">${[["again","Again",0],["hard","Hard",3],["good","Good",4],["easy","Easy",5]].map(([k,l,g],i)=>`<button class="grade ${k}" data-g="${g}">${l}<small>${fmtIvl(iv[i])}</small></button>`).join("")}</div>`:`<button class="btn primary block" id="show">Show answer</button>`}
+  </section>`;
+  const sb=$("#show");if(sb)sb.addEventListener("click",()=>{RV.shown=true;renderReview()});
+  view.querySelectorAll("[data-g]").forEach(b=>b.addEventListener("click",()=>{grade(c,+b.dataset.g);RV.card=null;renderReview()}));
+}
+
+/* ================= SOURCES ================= */
+function renderSources(){
+  const groups={};Object.entries(SOURCES).forEach(([k,s])=>{if(!s.pmid)return;(groups[s.kind]=groups[s.kind]||[]).push(s)});
+  view.innerHTML=`<section class="screen stack-lg">
+    <div class="hero"><span class="eyebrow">Sources & updates</span><h1>Where every answer comes from</h1><p class="muted">Content version ${CONTENT_VERSION}, reviewed ${REVIEWED}. All PMIDs were checked against PubMed records.</p></div>
+    <div class="panel stack"><h3>How this stays current</h3><p style="font-size:15px">A monthly scan searches PubMed and society publications (ATS, ESICM, SCCM, ERS, CHEST, Surviving Sepsis, GOLD) for new or updated guidelines and landmark trials. It drafts proposed edits for any card, question, or case that's affected. Nothing changes here until a physician reviewer approves it. Next scan: ${NEXT_SCAN}.</p></div>
+    ${["Guideline","Definition","Trial","Analysis","Study"].filter(k=>groups[k]).map(k=>`<div class="stack"><h2>${k==="Analysis"||k==="Study"?k+" papers":k+"s"}</h2><div class="panel">${groups[k].map(s=>`<div class="src"><span class="t">${s.title}</span><span class="c">${s.cite} · <a href="https://pubmed.ncbi.nlm.nih.gov/${s.pmid}/" target="_blank" rel="noopener">PMID ${s.pmid}</a></span></div>`).join("")}</div></div>`).join("")}
+    <div class="panel stack"><h3>Change log</h3><p style="font-size:14.5px"><span class="mono">v1.0 · ${REVIEWED}</span> First release: 4 simulator missions, 5 cases, 17 questions, ${CARDS.length} review cards. Reflects ATS 2024 ARDS update, ESICM 2023 ARDS guideline, and the 2024 global ARDS definition.</p></div>
+    <div class="panel stack" id="backup"><h3>Back up your progress</h3><p class="muted" style="font-size:14.5px">Progress is saved ${syncMode==="account"?"to your claude.ai account":"on this device"}. Copy a backup code and keep it somewhere safe (Notes works). Restore it on a new phone or after clearing data.</p><div class="row"><button class="btn ghost" id="bk-copy">Copy backup code</button><button class="btn ghost" id="bk-restore">Restore from code</button></div><div id="bk-area" class="stack"></div></div>
+    <p class="muted" style="font-size:13px">For education only. Not medical advice and not a substitute for clinical judgment, institutional protocols, or consultation with critical care specialists. The simulator uses a simplified single-compartment lung model.</p>
+  </section>`;
+  wireBackup();
+}
+function b64enc(s){return btoa(unescape(encodeURIComponent(s)))}
+function b64dec(s){return decodeURIComponent(escape(atob(s)))}
+function wireBackup(){
+  const area=$("#bk-area");
+  $("#bk-copy").addEventListener("click",()=>{
+    const code="PLATEAU1:"+b64enc(JSON.stringify(S));
+    const showCode=()=>{area.innerHTML=`<label for="bk-out" class="muted" style="font-size:13.5px">Select all and copy this code:</label><textarea id="bk-out" readonly rows="4" class="mono" style="width:100%;font-size:12px;background:var(--raised);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px">${code}</textarea>`;const t=$("#bk-out");t.focus();t.select()};
+    try{navigator.clipboard.writeText(code).then(()=>{toast("Backup code copied. Paste it into Notes.");area.innerHTML=""},showCode)}catch(e){showCode()}
+  });
+  $("#bk-restore").addEventListener("click",()=>{
+    area.innerHTML=`<label for="bk-in" class="muted" style="font-size:13.5px">Paste your backup code:</label><textarea id="bk-in" rows="4" class="mono" style="width:100%;font-size:12px;background:var(--raised);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px"></textarea><button class="btn primary" id="bk-check">Check code</button><div id="bk-msg"></div>`;
+    $("#bk-check").addEventListener("click",()=>{
+      const msg=$("#bk-msg");let data=null;
+      try{const raw=$("#bk-in").value.trim();if(!raw.startsWith("PLATEAU1:"))throw 0;data=JSON.parse(b64dec(raw.slice(9)));if(typeof data!=="object"||typeof data.xp!=="number")throw 0}catch(e){msg.innerHTML=`<p style="color:var(--crit);font-size:14.5px">That code isn't a valid Plateau backup. Copy the whole code, starting with PLATEAU1:</p>`;return}
+      msg.innerHTML=`<div class="fb"><p>This backup has <b>${data.xp} XP</b>. Restoring replaces your current progress (${S.xp} XP).</p><div class="row"><button class="btn primary" id="bk-go">Replace my progress</button><button class="btn ghost" id="bk-no">Cancel</button></div></div>`;
+      $("#bk-no").addEventListener("click",()=>{area.innerHTML=""});
+      $("#bk-go").addEventListener("click",()=>{S=Object.assign(blankState(),data);save();toast("Progress restored");route()});
+    });
+  });
+}
+
+/* ================= SIMULATOR ================= */
+const SIM={mission:null,s:null,meas:{},pending:null,done:false};
+function simKey(){return JSON.stringify(SIM.s)}
+function loadMission(id){const m=MISSIONS.find(x=>x.id===id)||MISSIONS[0];SIM.mission=m;SIM.s=Object.assign({},m.start);SIM.meas={};SIM.pending=null}
+const CTRL={
+  vt:{l:"Tidal volume",u:"mL",min:200,max:900,step:10,fmt:v=>v},
+  pinsp:{l:"Insp. pressure",u:"above PEEP",min:5,max:35,step:1,fmt:v=>v},
+  rr:{l:"Rate",u:"/min",min:6,max:40,step:1,fmt:v=>v},
+  peep:{l:"PEEP",u:"cm H₂O",min:0,max:24,step:1,fmt:v=>v},
+  fio2:{l:"FiO₂",u:"",min:.21,max:1,step:.05,fmt:v=>v.toFixed(2)},
+  flow:{l:"Insp. flow",u:"L/min",min:30,max:100,step:5,fmt:v=>v},
+  ti:{l:"Insp. time",u:"s",min:.4,max:2,step:.05,fmt:v=>v.toFixed(2)}
+};
+function renderSim(mid){
+  stopWave();
+  if(mid&&(!SIM.mission||SIM.mission.id!==mid))loadMission(mid);
+  if(!SIM.mission)loadMission((MISSIONS.find(m=>!S.missions[m.id])||MISSIONS[0]).id);
+  const M=SIM.mission,pt=PATIENTS[M.pt];
+  const keys=SIM.s.mode==="VC"?["vt","rr","peep","fio2","flow"]:["pinsp","ti","rr","peep","fio2"];
+  view.innerHTML=`<section class="screen stack">
+    <div class="hero"><span class="eyebrow">Ventilator simulator</span><h1>${M.title}</h1></div>
+    <div class="chips" role="group" aria-label="Missions">${MISSIONS.map(m=>`<button class="chip" data-m="${m.id}" aria-pressed="${m.id===M.id}">${S.missions[m.id]?"✓ ":""}${m.title}</button>`).join("")}</div>
+    <p class="narr" style="font-size:15.5px">${M.brief}</p>
+    <div class="monitor">
+      <div class="mon-head"><span><b>${pt.name}</b> · ${pt.sex==="M"?"M":"F"} ${pt.cm} cm · PBW ${pbw(pt.sex,pt.cm).toFixed(0)} kg</span><span id="modeTag"></span></div>
+      <div class="mon-body"><div class="wave"><canvas id="wave" aria-label="Pressure, flow, and volume waveforms"></canvas></div><div class="nums" id="nums"></div></div>
+      <div id="alarm"></div>
+    </div>
+    <div class="row" style="justify-content:space-between"><div class="modes" role="group" aria-label="Mode"><button data-mode="VC" aria-pressed="${SIM.s.mode==="VC"}">Volume</button><button data-mode="PC" aria-pressed="${SIM.s.mode==="PC"}">Pressure</button></div><button class="btn ghost" id="reset" style="min-height:38px;padding:8px 12px;font-size:14px">Reset</button></div>
+    <div class="ctrls">${keys.map(k=>{const c=CTRL[k];return `<div class="ctrl"><div class="lab"><span>${c.l}</span><span><output id="o-${k}" class="mono">${c.fmt(SIM.s[k])}</output> <small>${c.u}</small></span></div><div class="adj"><button data-step="${k}" data-d="-1" aria-label="Decrease ${c.l}">−</button><input type="range" id="r-${k}" data-k="${k}" min="${c.min}" max="${c.max}" step="${c.step}" value="${SIM.s[k]}" aria-label="${c.l}"><button data-step="${k}" data-d="1" aria-label="Increase ${c.l}">+</button></div></div>`}).join("")}</div>
+    <div class="actions"><button class="btn ghost" id="ih">Insp hold</button><button class="btn ghost" id="eh">Exp hold</button><button class="btn ghost" id="abgb">Draw ABG</button></div>
+    <div class="panel" id="abgp"></div>
+    <div class="panel stack"><div class="row" style="justify-content:space-between"><h3>Goals</h3><span class="mono muted" style="font-size:12px" id="gcount"></span></div><ul class="goals" id="goals"></ul><button class="btn primary block" id="submit">Submit settings</button></div>
+    <details class="panel"><summary>Physiology under the hood</summary><div class="coach" id="coach" style="margin-top:10px"></div></details>
+  </section>`;
+  view.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click",()=>{history.replaceState(null,"","#sim-"+b.dataset.m.slice(2));loadMission(b.dataset.m);renderSim()}));
+  view.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{if(SIM.s.mode===b.dataset.mode)return;SIM.s.mode=b.dataset.mode;SIM.meas={};renderSim()}));
+  $("#reset").addEventListener("click",()=>{loadMission(M.id);renderSim()});
+  view.querySelectorAll("input[type=range]").forEach(r=>r.addEventListener("input",()=>setCtrl(r.dataset.k,+r.value)));
+  view.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.step,c=CTRL[k];setCtrl(k,Math.round((SIM.s[k]+c.step*(+b.dataset.d))*100)/100)}));
+  $("#ih").addEventListener("click",()=>doHold("insp"));
+  $("#eh").addEventListener("click",()=>doHold("exp"));
+  $("#abgb").addEventListener("click",drawABG);
+  $("#submit").addEventListener("click",submitSim);
+  updateSim();startWave();
+}
+function setCtrl(k,v){const c=CTRL[k];v=Math.min(c.max,Math.max(c.min,v));if(k==="fio2")v=Math.max(.21,Math.round(v*100)/100);SIM.s[k]=v;const o=$("#o-"+k);if(o)o.textContent=c.fmt(v);const r=$("#r-"+k);if(r&&+r.value!==v)r.value=v;SIM.meas={};updateSim();if(reducedMotion())fillStatic()}
+function curModel(){return physio(PATIENTS[SIM.mission.pt],SIM.s)}
+function doHold(t){if(SIM.pending)return;SIM.pending=t;const b=$(t==="insp"?"#ih":"#eh");if(b){b.disabled=true;b.textContent="Holding…"}if(reducedMotion()){completeHold(t,simKey());fillStatic()}}
+function completeHold(t,key){SIM.pending=null;if(key===simKey())SIM.meas[t]=true;const ih=$("#ih"),eh=$("#eh");if(ih){ih.disabled=false;ih.textContent="Insp hold"}if(eh){eh.disabled=false;eh.textContent="Exp hold"}updateSim()}
+function drawABG(){const b=$("#abgb");b.disabled=true;b.textContent="Running…";const key=simKey();setTimeout(()=>{if(!$("#abgb"))return;b.disabled=false;b.textContent="Draw ABG";if(key===simKey()){SIM.meas.abg=true;updateSim()}else toast("Settings changed while the ABG ran. Draw another.")},reducedMotion()?0:900)}
+function updateSim(){
+  const m=curModel(),s=SIM.s,meas=SIM.meas,pt=PATIENTS[SIM.mission.pt];
+  const tag=$("#modeTag");if(tag)tag.textContent=s.mode==="VC"?"VC-AC":"PC-AC";
+  const nums=[
+    ["p","Peak",m.ppeak.toFixed(0),"cm",m.ppeak>40],
+    ["p","Plateau",meas.insp?m.pplat.toFixed(0):"--","cm",meas.insp&&m.pplat>30,!meas.insp],
+    ["p","Total PEEP",meas.exp?m.peepTot.toFixed(1):"--","cm",meas.exp&&m.ai>5,!meas.exp],
+    ["v2","Vt exh",m.vt.toFixed(0),"mL",false],
+    ["v2","Vt/PBW",m.vtkg.toFixed(1),"mL/kg",m.vtkg>8.05],
+    ["f","Min vent",m.ve.toFixed(1),"L/min",false],
+    ["f","I:E","1:"+(m.te/m.ti).toFixed(1),"",m.inverse],
+    ["v2","SpO₂",m.spo2.toFixed(0),"%",m.spo2<88],
+    ["f","MAP",m.map.toFixed(0),"mmHg",m.map<65],
+    ["f","HR",m.hr.toFixed(0),"",m.hr>130]
+  ];
+  const n=$("#nums");if(n)n.innerHTML=nums.map(([c,k,v,u,al,pend])=>`<div class="num ${c} ${al?"alarm":""} ${pend?"pending":""}"><div class="k">${k}</div><div class="v">${v}<span class="u">${u}</span></div></div>`).join("");
+  const alarms=[];if(m.ppeak>40)alarms.push("HIGH PEAK PRESSURE");if(m.spo2<88)alarms.push("LOW SpO₂");if(m.map<65)alarms.push("HYPOTENSION");if(m.inverse)alarms.push("INVERSE I:E");
+  const a=$("#alarm");if(a)a.innerHTML=alarms.length?`<div class="alarmbar" role="status">▲ ${alarms.join(" · ")}</div>`:"";
+  const ap=$("#abgp");if(ap)ap.innerHTML=meas.abg?`<div class="stack" style="gap:8px"><div class="row" style="justify-content:space-between"><h3>Arterial blood gas</h3><span class="pill good">Current settings</span></div><div class="abg">${[["pH",m.ph.toFixed(2)],["PaCO₂",m.paco2.toFixed(0)],["PaO₂",m.pao2.toFixed(0)],["HCO₃",m.hco3.toFixed(0)],["P/F",m.pf.toFixed(0)]].map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join("")}</div></div>`:`<div class="row" style="justify-content:space-between"><h3>Arterial blood gas</h3><span class="muted" style="font-size:14px">Draw one after you change settings</span></div>`;
+  const g=SIM.mission.goals.map(G=>{if(G.need&&!meas[G.need])return {G,st:null};return {G,st:!!G.t(m,s)}});
+  const gl=$("#goals");if(gl)gl.innerHTML=g.map(({G,st})=>`<li><span class="gdot ${st===true?"ok":st===false?"no":""}">${st===true?"✓":st===false?"✕":""}</span><span>${G.l}${st===null?` <span class="muted">· needs ${G.need==="abg"?"an ABG":G.need==="insp"?"an inspiratory hold":"an expiratory hold"}</span>`:""}</span></li>`).join("");
+  const gc=$("#gcount");if(gc)gc.textContent=g.filter(x=>x.st===true).length+" / "+g.length;
+  const co=$("#coach");if(co){const tau=m.tau;co.innerHTML=`<span>Time constant (τ = R × C): <b class="mono">${tau.toFixed(2)} s</b>. Full exhalation takes about 3–5τ: <b class="mono">${(3*tau).toFixed(1)} s</b>.</span><span>Each breath: Ti <b class="mono">${m.ti.toFixed(2)} s</b>, Te <b class="mono">${m.te.toFixed(2)} s</b>. ${m.te<3*tau?"Exhalation is cut short, so air gets trapped. ":"Enough time to exhale. "}</span>${meas.insp?`<span>Static compliance (Vt ÷ driving pressure): <b class="mono">${(m.vt/m.dp).toFixed(0)} mL/cm H₂O</b>. Driving pressure: <b class="mono">${m.dp.toFixed(1)}</b>.${s.mode==="VC"?` Airway resistance ((peak − plateau) ÷ flow): <b class="mono">${((m.ppeak-m.pplat)/m.flowLs).toFixed(0)} cm H₂O/L/s</b>.`:""}</span>`:`<span>Do an inspiratory hold to measure compliance and resistance.</span>`}<span>Dead space and minute ventilation set PaCO₂; FiO₂ and PEEP set PaO₂. The model is a single-compartment lung, a teaching simplification.</span>`}
+}
+function submitSim(){
+  const m=curModel(),s=SIM.s,M=SIM.mission;
+  const res=M.goals.map(G=>({G,need:G.need&&!SIM.meas[G.need],ok:!(G.need&&!SIM.meas[G.need])&&G.t(m,s)}));
+  const missing=res.filter(r=>r.need);
+  if(missing.length){toast("Measure first: "+[...new Set(missing.map(r=>r.G.need==="abg"?"ABG":r.G.need==="insp"?"insp hold":"exp hold"))].join(", "));return}
+  const fails=res.filter(r=>!r.ok);
+  if(fails.length){boostCards(M.cards.slice(0,2),"Simulator: "+M.title);save();
+    const sh=sheet(`<div class="stack"><span class="pill warn">${res.length-fails.length} of ${res.length} goals met</span><h2>Not quite</h2><ul class="points">${fails.map(f=>`<li><b>${f.G.l}.</b> ${f.G.h}</li>`).join("")}</ul><button class="btn primary block" data-close>Keep adjusting</button></div>`);return}
+  const first=!S.missions[M.id];S.missions[M.id]={done:true,at:Date.now()};
+  if(first)addXP(50);else addXP(5);
+  sheet(`<div class="stack"><span class="pill good">All goals met${first?" · +50 XP":""}</span><h2>${M.title}: done</h2><p style="font-size:15.5px">${M.debrief}</p>${refList(M.refs)}<div class="row"><button class="btn primary" data-close id="nextm">Next mission</button><button class="btn ghost" data-close>Stay here</button></div></div>`);
+  const nm=$("#nextm");if(nm)nm.addEventListener("click",()=>{const i=MISSIONS.indexOf(M);const n=MISSIONS[(i+1)%MISSIONS.length];location.hash="sim-"+n.id.slice(2)});
+}
+
+/* ---------- waveforms ---------- */
+const SR=50,WIN=6;const W={buf:[],head:0,plan:null,t:0,raf:0,last:0,cv:null,ctx:null,ro:null};
+function reducedMotion(){return matchMedia("(prefers-reduced-motion: reduce)").matches}
+function newPlan(){const s=Object.assign({},SIM.s),m=curModel(),hold=SIM.pending;return {s,m,key:simKey(),hold,ti:m.ti,ip:hold==="insp"?0.8:0,te:m.te,ep:hold==="exp"?0.9:0,total:m.ti+(hold==="insp"?0.8:0)+m.te+(hold==="exp"?0.9:0)}}
+function sampleAt(p,t){
+  const m=p.m,s=p.s,C=m.C,tau=m.tau,ai=m.ai;
+  if(t<p.ti){
+    if(s.mode==="VC"){const V=m.flowLs*1000*t;return {p:s.peep+(m.trap+V)/C+m.R*m.flowLs,f:s.flow,v:V}}
+    const dv=C*Math.max(0,s.pinsp-ai);const V=dv*(1-Math.exp(-t/tau));return {p:s.peep+s.pinsp,f:(dv/1000/tau)*Math.exp(-t/tau)*60,v:V}
+  }
+  t-=p.ti;
+  if(t<p.ip)return {p:m.pplat,f:0,v:m.vt};
+  t-=p.ip;
+  if(t<p.te){const Va=(m.trap+m.vt)*Math.exp(-t/tau);return {p:s.peep,f:-(Va/1000/tau)*60,v:Math.max(0,Va-m.trap)}}
+  return {p:m.peepTot,f:0,v:0};
+}
+function stepWave(dt){
+  const N=SR*WIN;if(W.buf.length!==N){W.buf=new Array(N).fill(null);W.head=0}
+  let n=Math.round(dt*SR);
+  while(n-->0){
+    if(!W.plan)W.plan=newPlan();
+    W.t+=1/SR;
+    if(W.t>=W.plan.total){
+      if(W.plan.hold){const h=W.plan.hold,k=W.plan.key;SIM.pending=null;setTimeout(()=>completeHold(h,k),0)}
+      W.t-=W.plan.total;W.plan=newPlan();
+    }
+    W.buf[W.head]=sampleAt(W.plan,W.t);W.head=(W.head+1)%N;
+  }
+}
+function fillStatic(){W.plan=null;W.t=0;W.buf=[];stepWave(WIN);drawWave()}
+function sizeCanvas(){const cv=W.cv;if(!cv)return;const r=cv.getBoundingClientRect();const d=window.devicePixelRatio||1;cv.width=Math.max(1,Math.round(r.width*d));cv.height=Math.max(1,Math.round(r.height*d));W.ctx=cv.getContext("2d");W.ctx.setTransform(d,0,0,d,0,0);W.w=r.width;W.h=r.height}
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function drawWave(){
+  const ctx=W.ctx;if(!ctx)return;const w=W.w,h=W.h,N=SR*WIN;
+  const m=curModel();
+  const col={p:cssVar("--mon-p"),f:cssVar("--mon-f"),v:cssVar("--mon-v"),grid:cssVar("--mon-line"),txt:cssVar("--mon-muted")};
+  ctx.clearRect(0,0,w,h);
+  const pMax=Math.max(40,Math.ceil((Math.max(m.ppeak,m.pplat)+5)/10)*10);
+  const fMax=Math.max(60,Math.ceil(Math.max(m.peakFlow,(m.trap+m.vt)/1000/m.tau*60)/20)*20);
+  const vMax=Math.max(600,Math.ceil((m.vt+100)/100)*100);
+  const ch=[{k:"p",lo:0,hi:pMax,c:col.p,lab:"Paw",u:"cm H₂O"},{k:"f",lo:-fMax,hi:fMax,c:col.f,lab:"Flow",u:"L/min"},{k:"v",lo:0,hi:vMax,c:col.v,lab:"Vol",u:"mL"}];
+  const bandH=h/3,padT=16,padB=8,left=34;
+  ctx.font="10px "+cssVar("--font-data");ctx.textBaseline="middle";
+  ch.forEach((c,i)=>{
+    const y0=i*bandH+padT,y1=(i+1)*bandH-padB;const Y=v=>y1-(v-c.lo)/(c.hi-c.lo)*(y1-y0);
+    ctx.strokeStyle=col.grid;ctx.lineWidth=1;ctx.beginPath();
+    [c.lo,c.lo<0?0:(c.lo+c.hi)/2,c.hi].forEach(v=>{ctx.moveTo(left,Y(v));ctx.lineTo(w-6,Y(v))});ctx.stroke();
+    ctx.fillStyle=col.txt;ctx.fillText(String(c.hi),4,Y(c.hi));ctx.fillText(String(c.lo<0?0:c.lo),4,Y(c.lo<0?0:c.lo));
+    ctx.fillStyle=c.c;ctx.fillText(c.lab+" "+c.u,left+4,i*bandH+7);
+    ctx.strokeStyle=c.c;ctx.lineWidth=2;ctx.lineJoin="round";ctx.beginPath();
+    let pen=false;const gap=Math.round(SR*0.25);
+    for(let j=0;j<N;j++){
+      const smp=W.buf[j];const dist=(j-W.head+N)%N;
+      if(!smp||(!reducedMotion()&&dist<gap)){pen=false;continue}
+      const x=left+(j/(N-1))*(w-left-6);const y=Math.min(y1,Math.max(y0,Y(Math.max(c.lo,Math.min(c.hi,smp[c.k])))));
+      if(!pen){ctx.moveTo(x,y);pen=true}else ctx.lineTo(x,y);
+      if(j===N-1)pen=false;
+    }
+    ctx.stroke();
+  });
+  // cursor
+  if(!reducedMotion()){const x=left+(W.head/(N-1))*(w-left-6);ctx.strokeStyle=col.txt;ctx.globalAlpha=.35;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();ctx.globalAlpha=1}
+}
+function frame(ts){
+  if(!W.cv||!document.body.contains(W.cv)){W.raf=0;return}
+  const dt=W.last?Math.min(.1,(ts-W.last)/1000):0;W.last=ts;W.acc=(W.acc||0)+dt;
+  const steps=Math.floor(W.acc*SR);if(steps>0){stepWave(steps/SR);W.acc-=steps/SR}
+  drawWave();W.raf=requestAnimationFrame(frame);
+}
+function startWave(){
+  W.cv=$("#wave");W.buf=[];W.head=0;W.plan=null;W.t=0;W.last=0;W.acc=0;sizeCanvas();
+  if(W.ro)W.ro.disconnect();W.ro=new ResizeObserver(()=>{sizeCanvas();drawWave()});W.ro.observe(W.cv);
+  if(reducedMotion()){fillStatic();return}
+  stepWave(WIN*0.4);W.raf=requestAnimationFrame(frame);
+}
+function stopWave(){if(W.raf)cancelAnimationFrame(W.raf);W.raf=0;if(W.ro){W.ro.disconnect();W.ro=null}W.cv=null}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>drawWave());
+
+/* ================= BOOT ================= */
+route();
+initCloud();
+</script>
