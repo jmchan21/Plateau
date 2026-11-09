@@ -1,6 +1,6 @@
 # Personal Dot Phrase Library (add-ons to UCI department templates)
 
-These do not replace the department's note templates. Drop them into the A/P or the end of a note. Loading: Epic > SmartPhrase Manager > New > name it (`.JC...`) > paste. `***` is a wildcard (F2 jumps to the next one). `{a/b/c}` should become a SmartList, or delete the options you don't use. If an `@TOKEN@` doesn't resolve, type `@` in the editor and search for the UCI equivalent.
+These do not replace the department's note templates. Drop them into the A/P or the end of a note. Loading: Epic > SmartPhrase Manager > New > name it (`.JMC...`) > paste. `***` is a wildcard (F2 jumps to the next one). `{a/b/c}` should become a SmartList, or delete the options you don't use. If an `@TOKEN@` doesn't resolve, type `@` in the editor and search for the UCI equivalent.
 
 Use UCI's approved department attestations for residents, APPs, and procedures; this library has none. Before building, search SmartPhrase Manager for existing department versions (keywords: sepsis, critical care, secure chat). Copy and personalize instead of starting from scratch.
 
@@ -8,12 +8,12 @@ Use UCI's approved department attestations for residents, APPs, and procedures; 
 
 ## Note add-ons
 
-### `.JCCOURSE`: Hospital course to date (top of A/P, update daily)
+### `.JMCCOURSE`: Hospital course to date (top of A/P, update daily)
 ```
 HOSPITAL COURSE TO DATE (HD @LOS@): *** y/o with *** admitted @ADMITDATE@ for ***. Key events: ***. Current status: ***. Remaining before discharge: ***.
 ```
 
-### `.JCQC`: Daily quality check (bottom of A/P)
+### `.JMCQC`: Daily quality check (bottom of A/P)
 ```
 QUALITY / SAFETY:
 VTE ppx: {enoxaparin/heparin SQ/therapeutic anticoagulation/SCDs, pharmacologic contraindicated due to ***}
@@ -24,12 +24,12 @@ Code status: @CODESTATUS@ (confirmed with {patient/surrogate ***})
 EDD: ***  Barriers: ***  Dispo: {home/home health/SNF/IRF/LTACH/hospice}
 ```
 
-### `.JCQCICU`: ICU additions
+### `.JMCQCICU`: ICU additions
 ```
 ICU BUNDLE: SAT {done/held because ***}, SBT {passed/failed/not eligible because ***}. RASS goal ***, actual ***. CAM-ICU {neg/pos}. Mobility: ***. Family updated: {yes, *** /not yet}. Lines/tubes reviewed for removal: ***.
 ```
 
-### `.JCRECON`: Messy chart reconstruction (Sticky Note, not in the chart)
+### `.JMCRECON`: Messy chart reconstruction (Sticky Note, not in the chart)
 ```
 WHY HERE: ***
 DONE (dates): ***
@@ -38,7 +38,7 @@ WAITING FOR: ***
 RISK NEXT 24H: ***
 ```
 
-### `.JCMDM`: Medical decision making (see `MDM-GUIDE.md` for how to use it)
+### `.JMCMDM`: Medical decision making (see `MDM-GUIDE.md` for how to use it)
 ```
 MEDICAL DECISION MAKING
 Problem: {[HIGH] *** is a threat to life or organ function without treatment/[HIGH] *** is a severe flare of chronic ***/[MOD] *** chronic illness worsening or with treatment side effect/[MOD] 2+ chronic illnesses managed today: ***/[MOD] new undiagnosed problem with uncertain prognosis: ***/[MOD] acute illness with systemic symptoms: ***/[LOW] stable or uncomplicated illness requiring hospital care: ***}
@@ -51,7 +51,7 @@ Data:
 Risk: {[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}
 ```
 
-### `.JCTIME`: Time statement (only when the minutes are true; required for discharge over 30 min, critical care, and advance care planning)
+### `.JMCTIME`: Time statement (only when the minutes are true; required for discharge over 30 min, critical care, and advance care planning)
 ```
 I spent *** minutes on the date of service in the care of this patient, including chart review, examination, documentation, and coordination with the care team, excluding separately billed procedures and teaching time.
 ```
@@ -62,7 +62,7 @@ I spent *** minutes on the date of service in the care of this patient, includin
 
 Each block: specific diagnosis plus trajectory, evidence as trends, reasoning only if needed, verb-first plan, endpoint. Delete lines that don't apply.
 
-### `.JCSEPSIS`
+### `.JMCSEPSIS`
 ```
 #Sepsis {without organ dysfunction/with *** (acute organ dysfunction)/septic shock} due to *** (organism ***), {improving/worsening/unchanged}
 Tmax *** ; lactate *** to *** ; WBC *** to *** ; cultures: ***
@@ -73,7 +73,7 @@ Tmax *** ; lactate *** to *** ; WBC *** to *** ; cultures: ***
 SEP-1 (day 1): lactate ***, BCx before abx at ***, abx at ***, fluids *** mL/kg {/less due to ***}, reassessment at ***
 ```
 
-### `.JCAHRF`
+### `.JMCAHRF`
 ```
 #Acute {hypoxic/hypercapnic/hypoxic and hypercapnic} respiratory failure due to ***, {improving/worsening/unchanged}
 {SpO2 *** on ***/P:F ***/pH *** PaCO2 ***}; RR ***; work of breathing ***
@@ -82,7 +82,7 @@ SEP-1 (day 1): lactate ***, BCx before abx at ***, abx at ***, fluids *** mL/kg 
 - Endpoint: room air or home O2 *** L at rest and ambulation
 ```
 
-### `.JCHF`
+### `.JMCHF`
 ```
 #Acute on chronic {HFrEF (EF ***%)/HFpEF (EF ***%)/HFmrEF}, NYHA ***, {improving/worsening/unchanged}
 Weight *** to *** kg (dry ~***), net ***; JVP ***; edema ***. Trigger: ***
@@ -91,7 +91,7 @@ Weight *** to *** kg (dry ~***), net ***; JVP ***; edema ***. Trigger: ***
 - Endpoint: euvolemic on PO diuretic x24 h; HF follow-up within 7 days
 ```
 
-### `.JCAKI`
+### `.JMCAKI`
 ```
 #AKI, KDIGO stage ***, {prerenal/ATN/obstructive/***} from ***, {improving/worsening/unchanged}
 Cr baseline *** to peak *** to today ***; UOP *** mL/kg/h; {FENa/FEUrea} ***
@@ -100,7 +100,7 @@ Cr baseline *** to peak *** to today ***; UOP *** mL/kg/h; {FENa/FEUrea} ***
 - Endpoint: Cr at or near baseline; resume *** then
 ```
 
-### `.JCTROP`
+### `.JMCTROP`
 ```
 #{Type 1 NSTEMI/Type 2 MI due to ***/Non-ischemic myocardial injury, {acute/chronic}}, {improving/resolved}
 hs-troponin *** to *** to *** ng/L; ECG (my read): ***; TTE: ***
@@ -108,7 +108,7 @@ hs-troponin *** to *** to *** ng/L; ECG (my read): ***; TTE: ***
 - ***
 ```
 
-### `.JCENCEPH`
+### `.JMCENCEPH`
 ```
 #Acute {metabolic/toxic/toxic-metabolic} encephalopathy due to ***, {improving/worsening/unchanged}
 CAM {+/-}; baseline per *** is ***
@@ -117,7 +117,7 @@ CAM {+/-}; baseline per *** is ***
 - Endpoint: back to baseline per ***
 ```
 
-### `.JCNA`
+### `.JMCNA`
 ```
 #Hyponatremia, {hypovolemic/euvolemic (SIADH from ***)/hypervolemic}, {acute/chronic}, {improving/worsening}
 Na *** to *** ; Sosm *** ; Uosm *** ; UNa ***
@@ -126,7 +126,7 @@ Na *** to *** ; Sosm *** ; Uosm *** ; UNa ***
 - Endpoint: Na above *** and stable on discharge regimen
 ```
 
-### `.JCAWS`
+### `.JMCAWS`
 ```
 #Alcohol withdrawal, {mild/moderate/severe}, last drink ***, {seizure/DT history/no complicated history}, {improving/worsening}
 CIWA max *** ; ***
@@ -135,7 +135,7 @@ CIWA max *** ; ***
 - Addiction medicine {consulted/declined}; discuss naltrexone or acamprosate at discharge
 ```
 
-### `.JCGIB`
+### `.JMCGIB`
 ```
 #{Upper/Lower} GI bleed {from ***/source unknown}, {improving/worsening/unchanged}
 Hgb *** to *** ; Glasgow-Blatchford *** ; hemodynamics ***
@@ -145,12 +145,12 @@ Hgb *** to *** ; Glasgow-Blatchford *** ; hemodynamics ***
 - Endpoint: Hgb stable x24 h, tolerating diet
 ```
 
-### `.JCCHRONIC`
+### `.JMCCHRONIC`
 ```
 Chronic, stable: ***
 ```
 
-### `.JCDCCOURSE`: discharge summary, one paragraph per problem
+### `.JMCDCCOURSE`: discharge summary, one paragraph per problem
 ```
 **{Principal diagnosis}:** Admitted with ***. Treated with ***. Course notable for ***. At discharge: ***. **Follow-up needs to:** ***.
 ```
@@ -159,7 +159,7 @@ Chronic, stable: ***
 
 ## Night and ICU notes
 
-### `.JCEVENT`: Cross-cover / event note
+### `.JMCEVENT`: Cross-cover / event note
 ```
 CROSS-COVER EVENT NOTE
 Called by *** at *** for ***.
@@ -173,7 +173,7 @@ Primary team to follow up: ***
 Time: *** minutes.
 ```
 
-### `.JCCC`: Critical care (solo)
+### `.JMCCC`: Critical care (solo)
 ```
 CRITICAL CARE
 The patient is critically ill with *** (organ failure), with high probability of imminent or life-threatening deterioration.
@@ -181,7 +181,7 @@ Interventions: *** (for example vasopressor titration, ventilator management, AB
 Total critical care time: *** minutes, exclusive of separately billable procedures and teaching time.
 ```
 
-### `.JCACP`: Advance care planning
+### `.JMCACP`: Advance care planning
 ```
 ADVANCE CARE PLANNING
 Participants: ***  (patient {has/lacks} capacity)
@@ -196,52 +196,52 @@ Time spent in advance care planning (voluntary, face to face, separate from othe
 
 Short, closed-loop, and they set parameters so the same page doesn't come back. Secure Chat in Hyperspace accepts SmartPhrases; on Haiku/Rover, use your phone's text replacement for the short ones.
 
-### `.SCACK`: Acknowledge
+### `.JMCSCACK`: Acknowledge
 ```
 Got it, thanks. Coming to bedside in *** min. Please {get a full set of vitals/check a POC glucose/get an ECG} before I arrive.
 ```
 
-### `.SCORDER`: Order placed
+### `.JMCSCORDER`: Order placed
 ```
 Thanks. Ordered ***. Please let me know if ***.
 ```
 
-### `.SCPARAM`: Call parameters
+### `.JMCSCPARAM`: Call parameters
 ```
 Plan for tonight: ***. Please call me if SBP below *** or above ***, HR above ***, SpO2 below *** on ***, RR above ***, UOP below *** mL over *** h, new confusion, or you're worried.
 ```
 
-### `.SCPRN`: PRN clarification
+### `.JMCSCPRN`: PRN clarification
 ```
 *** PRN ordered for ***. If not effective after ***, please page me before giving a second dose.
 ```
 
-### `.SCFOLEY`: Foley removal
+### `.JMCSCFOLEY`: Foley removal
 ```
 Foley no longer indicated. Please remove and bladder scan q6h; straight cath if PVR above *** mL. Let me know if the patient can't void by ***.
 ```
 
-### `.SCGOALS`: Family update request
+### `.JMCSCGOALS`: Family update request
 ```
 Family would like an update. I'm planning to call *** at ***. If they arrive before then, please page me and I'll come to the bedside.
 ```
 
-### `.SCDISPO`: Case management, morning
+### `.JMCSCDISPO`: Case management, morning
 ```
 Good morning, I'm covering *** today. Likely discharge candidates: ***. Potential barriers: ***. Anything you need from me early?
 ```
 
-### `.SCPRIOR`: Prior attending, quick clarification
+### `.JMCSCPRIOR`: Prior attending, quick clarification
 ```
 Hi, I'm covering *** today. Quick question so I don't miss anything: what's your main concern and what's the endpoint for ***? Thanks!
 ```
 
-### `.SCNOTHING`: Reviewed, no change
+### `.JMCSCNOTHING`: Reviewed, no change
 ```
 Thanks for letting me know. Reviewed: ***. No change in plan tonight. Please call if ***.
 ```
 
-### `.SCPAGEFORMAT`: For charge nurse (helps pages arrive with what you need)
+### `.JMCSCPAGEFORMAT`: For charge nurse (helps pages arrive with what you need)
 ```
 Hi, to help me respond faster overnight, pages are most useful with: patient name and room, current vitals, the concern, and what you need (order, bedside eval, FYI). Thank you!
 ```

@@ -16,7 +16,7 @@ The question is not "how do I review charts faster." It is:
 
 1. **Review on the day of service, not the day before.** For time-based billing, non-face-to-face time counts only on the date of the encounter. Even on a per-shift salary, this is the habit you want for future practice.
 2. **Let Epic do the reading.** Saved filters and list columns show what changed. You read deltas, not whole charts.
-3. **Leave a running summary.** A 3 to 5 line "Hospital Course to Date" (`.JCCOURSE`) at the top of your A/P means the next doctor (often you, two weeks later) never rebuilds the story.
+3. **Leave a running summary.** A 3 to 5 line "Hospital Course to Date" (`.JMCCOURSE`) at the top of your A/P means the next doctor (often you, two weeks later) never rebuilds the story.
 
 ## One-time setup (about 90 minutes, once)
 
@@ -55,7 +55,7 @@ This is the hardest shift because nothing is familiar. The fix is **tiered revie
 | Time | Task |
 |---|---|
 | 0700 to 0715 | Sign-out from the nocturnist. Ask three questions: who's sickest, who could go home today, what's pending. |
-| 0715 to 0730 | List triage (columns sorted by Deterioration Index, then EDD). Tag each patient: **Sick / Going home / New admit / Stable**. Secure Chat case management with likely discharges (`.SCDISPO`). |
+| 0715 to 0730 | List triage (columns sorted by Deterioration Index, then EDD). Tag each patient: **Sick / Going home / New admit / Stable**. Secure Chat case management with likely discharges (`.JMCSCDISPO`). |
 | 0730 to 0900 | Review into the note (tiers below). Place consult orders and call consultants for new admits **now**, so consults happen today. |
 | 0900 to 1130 | Bedside: Sick, then Going home (discharge orders by 1100), then New admits (use Abridge here), then Stable. About 8 min each. |
 | 1130 to 1300 | Consultant and family calls; discharge summaries. |
@@ -86,7 +86,7 @@ This is the hardest shift because nothing is familiar. The fix is **tiered revie
 **Attesting overnight H&Ps (your usual role):** you attest most overnight resident H&Ps, so the initial visit (99221 to 99223) is yours. These are your highest-value notes of the day. Your 7-minute review plus bedside visit is the "personal participation" the attestation must describe. Use UCI's approved attestation, and make sure your note shows your own findings, your image or ECG read, and what you changed. Most sepsis, respiratory failure, and new heart failure admissions meet high MDM (99223) when you document it. The date of service is the date you personally see the patient; confirm edge cases (resident admits at 0200, you see at 1000) with UCI coding.
 **When a night attending already attested:** the initial visit is theirs. Your visit is subsequent care (99231 to 99233), and day 1 often meets high MDM (99233).
 
-**The first-day tax:** writing a 3-line `.JCCOURSE` for each of 12 new patients adds about 15 minutes on day 1. If you work the next day (or the next attending does), it saves 30+ minutes.
+**The first-day tax:** writing a 3-line `.JMCCOURSE` for each of 12 new patients adds about 15 minutes on day 1. If you work the next day (or the next attending does), it saves 30+ minutes.
 
 ### Decoding a messy chart (copy-paste notes, no reasoning)
 
@@ -103,14 +103,14 @@ Disorganized notes are common, not a personal failing of one group: in one acade
 
 If UCI's Epic has note provenance highlighting (copied vs typed text) or an AI chart summary, use them to skip copied blocks and get a first-pass timeline, then verify against the sources above.
 
-**Fill the 5-question sticky note (`.JCRECON`) as you go, 7 minutes max:**
+**Fill the 5-question sticky note (`.JMCRECON`) as you go, 7 minutes max:**
 1. Why are they here? (one line)
 2. What has been done, with dates?
 3. What is working, what is not?
 4. What are they waiting for?
 5. What could hurt them in the next 24 hours?
 
-If the story is still unclear after 7 minutes, stop reading. Ask the patient and nurse, and Secure Chat or call the prior attending (`.SCPRIOR`). Then turn the sticky note into `.JCCOURSE` and rewrite the A/P in your format. From that day forward the chart is clean, for you and everyone after you.
+If the story is still unclear after 7 minutes, stop reading. Ask the patient and nurse, and Secure Chat or call the prior attending (`.JMCSCPRIOR`). Then turn the sticky note into `.JMCCOURSE` and rewrite the A/P in your format. From that day forward the chart is clean, for you and everyone after you.
 
 ### B. Night shift with an APP (admissions and cross-cover)
 - **At sign-in, agree on division of labor out loud:** who takes which admissions (for example alternating, or you take the sicker or ICU-bound ones), who takes cross-cover pages, and when you check in (for example 2300 and 0300).
@@ -126,11 +126,11 @@ If the story is still unclear after 7 minutes, stop reading. Ask the patient and
 
 ### D. Night ICU solo
 - Your highest-acuity, highest-RVU night. Triage the same way, but write brief notes in real time. A 3-line event note at 0200 takes 2 minutes. Reconstructing it at 0630 takes 15 and is less accurate.
-- Use `.JCCC` for critical care and `.JCEVENT` for events.
+- Use `.JMCCC` for critical care and `.JMCEVENT` for events.
 - Procedures (central line, arterial line, intubation, thoracentesis) are billed separately and their time is **subtracted** from critical care time. Write the procedure note right after the procedure.
 
 ### E. Cross-cover pages (any night)
-- Use `.JCEVENT` for anything that changed management: bedside eval, new imaging, transfer, new med beyond a one-time PRN.
+- Use `.JMCEVENT` for anything that changed management: bedside eval, new imaging, transfer, new med beyond a one-time PRN.
 - Use the Secure Chat phrases to close the loop with nursing quickly and set parameters, so the same page doesn't come back in 2 hours.
 
 ## Abridge: how to start
@@ -156,7 +156,7 @@ How to start, low-risk:
 
 Confirm UCI's hospitalist and ICU scorecard with the division's quality lead. Common ones:
 
-**Daily (in `.JCQC`):** VTE prophylaxis or contraindication; Foley still needed (CAUTI); central line still needed (CLABSI); antibiotic day and stop date; C. diff testing only with 3+ unformed stools in 24 h and no laxatives (HO-CDI); avoid severe hypoglycemia and hyperglycemia (CMS Hospital Harm eCQMs); no opioid plus benzodiazepine at discharge without reason; code status confirmed; expected discharge date and barriers; ICU: SAT/SBT, sedation target, delirium screen, mobility (ABCDEF bundle).
+**Daily (in `.JMCQC`):** VTE prophylaxis or contraindication; Foley still needed (CAUTI); central line still needed (CLABSI); antibiotic day and stop date; C. diff testing only with 3+ unformed stools in 24 h and no laxatives (HO-CDI); avoid severe hypoglycemia and hyperglycemia (CMS Hospital Harm eCQMs); no opioid plus benzodiazepine at discharge without reason; code status confirmed; expected discharge date and barriers; ICU: SAT/SBT, sedation target, delirium screen, mobility (ABCDEF bundle).
 
 **Admissions:** SEP-1 (lactate, cultures before antibiotics, antibiotics within 3 h, 30 mL/kg for hypotension or lactate 4 or higher or documented reason for less, repeat lactate if above 2, timed reassessment); med rec; correct inpatient vs observation status.
 
@@ -188,7 +188,7 @@ Pick the level by **MDM or total same-day time, whichever is higher.**
 Notice the spread: a day of 99232s vs 99233s on 16 patients is about 13 wRVUs. Documenting what you already do to the right level is the largest lever.
 
 ### MDM: the honest route when your time is short
-See `MDM-GUIDE.md`: a plain-language guide with the 2-of-3 scoring rule, examples, nuances, and the `.JCMDM` phrase. Discharge, critical care, advance care planning, and prolonged services are billed by time only.
+See `MDM-GUIDE.md`: a plain-language guide with the 2-of-3 scoring rule, examples, nuances, and the `.JMCMDM` phrase. Discharge, critical care, advance care planning, and prolonged services are billed by time only.
 
 ### Teaching physician rules (your resident shifts)
 - For MDM-based billing, the resident documents and you attest that you saw the patient and participated in the key or critical portions, and agree or amend.

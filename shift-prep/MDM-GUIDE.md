@@ -121,7 +121,7 @@ Nuances:
 5. **APP split/shared visits:** whoever does the substantive part of the MDM can bill it. Use UCI's approved split/shared attestation.
 6. **When in doubt, code down.** Undercoding loses a little money; overcoding creates risk.
 
-## The phrase: `.JCMDM`
+## The phrase: `.JMCMDM`
 
 Paste at the bottom of the A/P. Keep only the lines that are true today and delete the rest. The bracketed tags are there for you; you can delete them before signing.
 
@@ -145,7 +145,7 @@ Risk: {[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regardi
 
 ## Practice
 
-For 2 weeks, add `.JCMDM` to every note and write down the level you think it earns (just a code and date, no patient information). If UCI coding gives feedback reports, compare. Most people get reliable within 30 to 40 notes.
+For 2 weeks, add `.JMCMDM` to every note and write down the level you think it earns (just a code and date, no patient information). If UCI coding gives feedback reports, compare. Most people get reliable within 30 to 40 notes.
 
 ## Source
 AMA CPT Evaluation and Management (E/M) Services Guidelines, 2023 and later (hospital inpatient and observation care), including the MDM table and definitions. Billing rules change yearly; confirm with UCI coding and compliance.
