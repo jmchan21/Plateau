@@ -78,7 +78,7 @@ Nuances:
 
 | Level | Plain meaning | Examples |
 |---|---|---|
-| **High** | **Deciding whether to escalate care** (admit, ICU transfer, or deciding against it) | "Decision to transfer to ICU for pressors" |
+| **High** | **Deciding whether to hospitalize or escalate care** (admit, ICU transfer, or deciding against it) | "Decision regarding hospitalization: requires IV antibiotics and monitoring"; "Decision to transfer to ICU for pressors" |
 | **High** | **Deciding on DNR or comfort care** because of poor prognosis | Goals of care with change to DNR or hospice |
 | **High** | **IV or IM controlled substance** | IV hydromorphone, IV lorazepam, phenobarbital |
 | **High** | **A drug that needs lab checks for toxicity** (checking for harm, not for whether it's working) | Vancomycin levels and daily Cr; aminoglycoside levels |
@@ -134,7 +134,7 @@ Data:
 - History from *** because patient ***
 - My own interpretation of ***: ***
 - Discussed management with Dr. *** (***): ***
-Risk: {[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}
+Risk: {[HIGH] Decision regarding hospitalization: ***/[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}
 ```
 
 **How to use it in 20 seconds:**

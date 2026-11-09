@@ -48,7 +48,7 @@ Data:
 - History from *** because patient ***
 - My own interpretation of ***: ***
 - Discussed management with Dr. *** (***): ***
-Risk: {[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}
+Risk: {[HIGH] Decision regarding hospitalization: ***/[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}
 ```
 
 ### `.JMCTIME`: Time statement (only when the minutes are true; required for discharge over 30 min, critical care, and advance care planning)
@@ -70,7 +70,7 @@ Tmax *** ; lactate *** to *** ; WBC *** to *** ; cultures: ***
 - Source control: ***
 - Pressors: {none/norepinephrine *** mcg/min, MAP goal 65}
 - Endpoint: afebrile 48 h, hemodynamically stable, PO transition to ***
-SEP-1 (day 1): lactate ***, BCx before abx at ***, abx at ***, fluids *** mL/kg {/less due to ***}, reassessment at ***
+SEP-1 (day 1): lactate ***, BCx before abx at ***, abx at ***, fluids *** mL/kg {(30 mL/kg)/(less than 30 mL/kg due to ***)}, reassessment at ***
 ```
 
 ### `.JMCAHRF`
@@ -102,7 +102,7 @@ Cr baseline *** to peak *** to today ***; UOP *** mL/kg/h; {FENa/FEUrea} ***
 
 ### `.JMCTROP`
 ```
-#{Type 1 NSTEMI/Type 2 MI due to ***/Non-ischemic myocardial injury, {acute/chronic}}, {improving/resolved}
+#{Type 1 NSTEMI/Type 2 MI due to ***/Acute non-ischemic myocardial injury/Chronic non-ischemic myocardial injury}, {improving/resolved}
 hs-troponin *** to *** to *** ng/L; ECG (my read): ***; TTE: ***
 {Favor *** over *** given ***.}
 - ***
@@ -152,7 +152,7 @@ Chronic, stable: ***
 
 ### `.JMCDCCOURSE`: discharge summary, one paragraph per problem
 ```
-**{Principal diagnosis}:** Admitted with ***. Treated with ***. Course notable for ***. At discharge: ***. **Follow-up needs to:** ***.
+***: Admitted with ***. Treated with ***. Course notable for ***. At discharge: ***. Follow-up needs to: ***.
 ```
 
 ---
@@ -170,7 +170,6 @@ Impression: ***
 Actions: ***
 Contingency: if ***, then ***.
 Primary team to follow up: ***
-Time: *** minutes.
 ```
 
 ### `.JMCCC`: Critical care (solo)
