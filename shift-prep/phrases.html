@@ -1,0 +1,494 @@
+<title>JMC Dot Phrases</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; sticky toolbar (progress + search); each phrase is a card with copy actions and a "loaded" checkbox. */
+:root{
+  --bg:#f3f6f7; --surface:#ffffff; --code:#eef3f4; --line:#d5e0e3; --fg:#13262b; --muted:#557077;
+  --accent:#0b6c77; --on-accent:#ffffff; --accent-soft:rgba(11,108,119,.10); --ok:#1d7a4a;
+  --f-body:"Atkinson Hyperlegible",-apple-system,"Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e171a; --surface:#152226; --code:#0b1316; --line:#26393e; --fg:#e3eef0; --muted:#8ea7ad;
+  --accent:#5ec6d0; --on-accent:#06262a; --accent-soft:rgba(94,198,208,.13); --ok:#56cf8e; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0e171a; --surface:#152226; --code:#0b1316; --line:#26393e; --fg:#e3eef0; --muted:#8ea7ad;
+  --accent:#5ec6d0; --on-accent:#06262a; --accent-soft:rgba(94,198,208,.13); --ok:#56cf8e; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:860px;margin:0 auto;padding-block:24px 64px;display:flex;flex-direction:column;gap:22px}
+h1{font-size:28px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0;display:flex;gap:8px;align-items:center}
+.ct{font-family:var(--f-mono);font-size:12px;letter-spacing:0;background:var(--accent-soft);color:var(--accent);padding:1px 8px;border-radius:99px}
+p{margin:0}
+.lead{color:var(--muted);max-width:65ch}
+.how{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.how ol{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.how code,.lead code{font-family:var(--f-mono);font-size:.9em;background:var(--code);padding:1px 5px;border-radius:5px}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar input[type=search]{flex:1 1 220px;min-width:0;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.prog{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meter{width:110px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .25s}
+.grp{display:flex;flex-direction:column;gap:12px}
+.ph{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ph.is-done{opacity:.62}
+.ph-h{display:flex;gap:12px;align-items:center;padding:12px 14px;flex-wrap:wrap}
+.ph-id{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}
+.nm{font-family:var(--f-mono);font-weight:600;font-size:16px;color:var(--accent)}
+.ds{color:var(--muted);font-size:14px}
+.acts{display:flex;gap:8px}
+.b{font:inherit;font-size:14px;font-weight:700;padding:8px 12px;border-radius:9px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer;min-height:40px}
+.b.ghost{background:transparent;color:var(--accent)}
+.b.copied{background:var(--ok);border-color:var(--ok);color:var(--on-accent)}
+.done{display:grid;place-items:center;width:28px;height:28px;flex:none;cursor:pointer}
+.done input{width:22px;height:22px;accent-color:var(--ok);cursor:pointer;margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.tx{margin:0;padding:12px 14px;background:var(--code);border-top:1px solid var(--line);font-family:var(--f-mono);font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.empty{color:var(--muted);text-align:center;padding:24px}
+.foot{color:var(--muted);font-size:14px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.meter i{transition:none}}
+</style>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>JMC Dot Phrases</h1>
+    <p class="lead">Personal add-ons to the UCI department templates. Attestations always use UCI's approved versions. 30 phrases, generated from <code>shift-prep/SMARTPHRASES.md</code>.</p>
+  </header>
+  <div class="how">
+    <strong>Loading each phrase into Epic</strong>
+    <ol>
+      <li>Epic menu, then <strong>SmartPhrase Manager</strong>, then <strong>New</strong>.</li>
+      <li>Tap <strong>Copy name</strong> and paste it as the phrase name (Epic drops the leading dot).</li>
+      <li>Tap <strong>Copy text</strong> and paste into the editor.</li>
+      <li>Check the <code>@TOKEN@</code> links resolve (they turn into fields). If one doesn't, delete it and type <code>@</code> to search for UCI's version.</li>
+      <li>Options in <code>{a/b/c}</code> paste as plain text. Either build them into a SmartList, or leave them and delete the unused options each time you write.</li>
+      <li>Accept, then tick the box on the card. Ticks are saved in this browser only.</li>
+    </ol>
+  </div>
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search phrases (sepsis, MDM, foley...)" aria-label="Search phrases">
+    <div class="prog"><div class="meter"><i id="mi"></i></div><span id="pc">0 of 30 loaded</span></div>
+  </div>
+  <section class="grp"><h2>Note add-ons <span class="ct">6</span></h2>
+<article class="ph" data-name=".JMCCOURSE" data-search=".jmccourse hospital course to date (top of a/p, update daily) hospital course to date (hd @los@): *** y/o with *** admitted @admitdate@ for ***. key events: ***. current status: ***. remaining before discharge: ***.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCCOURSE" data-key=".JMCCOURSE"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCCOURSE</code><span class="ds">Hospital course to date (top of A/P, update daily)</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">HOSPITAL COURSE TO DATE (HD @LOS@): *** y/o with *** admitted @ADMITDATE@ for ***. Key events: ***. Current status: ***. Remaining before discharge: ***.</pre>
+</article>
+<article class="ph" data-name=".JMCQC" data-search=".jmcqc daily quality check (bottom of a/p) quality / safety:
+vte ppx: {enoxaparin/heparin sq/therapeutic anticoagulation/scds, pharmacologic contraindicated due to ***}
+foley: {none/present, indication: ***/removed today}  central line: {none/present, indication: ***/removed today}
+antibiotics: {none/*** day # *** of ***, stop date ***}
+glucose: {at goal/insulin adjusted ***/not diabetic}
+code status: @codestatus@ (confirmed with {patient/surrogate ***})
+edd: ***  barriers: ***  dispo: {home/home health/snf/irf/ltach/hospice}">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCQC" data-key=".JMCQC"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCQC</code><span class="ds">Daily quality check (bottom of A/P)</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">QUALITY / SAFETY:
+VTE ppx: {enoxaparin/heparin SQ/therapeutic anticoagulation/SCDs, pharmacologic contraindicated due to ***}
+Foley: {none/present, indication: ***/removed today}  Central line: {none/present, indication: ***/removed today}
+Antibiotics: {none/*** day # *** of ***, stop date ***}
+Glucose: {at goal/insulin adjusted ***/not diabetic}
+Code status: @CODESTATUS@ (confirmed with {patient/surrogate ***})
+EDD: ***  Barriers: ***  Dispo: {home/home health/SNF/IRF/LTACH/hospice}</pre>
+</article>
+<article class="ph" data-name=".JMCQCICU" data-search=".jmcqcicu icu additions icu bundle: sat {done/held because ***}, sbt {passed/failed/not eligible because ***}. rass goal ***, actual ***. cam-icu {neg/pos}. mobility: ***. family updated: {yes, *** /not yet}. lines/tubes reviewed for removal: ***.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCQCICU" data-key=".JMCQCICU"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCQCICU</code><span class="ds">ICU additions</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">ICU BUNDLE: SAT {done/held because ***}, SBT {passed/failed/not eligible because ***}. RASS goal ***, actual ***. CAM-ICU {neg/pos}. Mobility: ***. Family updated: {yes, *** /not yet}. Lines/tubes reviewed for removal: ***.</pre>
+</article>
+<article class="ph" data-name=".JMCRECON" data-search=".jmcrecon messy chart reconstruction (sticky note, not in the chart) why here: ***
+done (dates): ***
+working / not: ***
+waiting for: ***
+risk next 24h: ***">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCRECON" data-key=".JMCRECON"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCRECON</code><span class="ds">Messy chart reconstruction (Sticky Note, not in the chart)</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">WHY HERE: ***
+DONE (dates): ***
+WORKING / NOT: ***
+WAITING FOR: ***
+RISK NEXT 24H: ***</pre>
+</article>
+<article class="ph" data-name=".JMCMDM" data-search=".jmcmdm medical decision making medical decision making
+problem: {[high] *** is a threat to life or organ function without treatment/[high] *** is a severe flare of chronic ***/[mod] *** chronic illness worsening or with treatment side effect/[mod] 2+ chronic illnesses managed today: ***/[mod] new undiagnosed problem with uncertain prognosis: ***/[mod] acute illness with systemic symptoms: ***/[low] stable or uncomplicated illness requiring hospital care: ***}
+data:
+- tests reviewed or ordered today: ***
+- outside records reviewed: ***
+- history from *** because patient ***
+- my own interpretation of ***: ***
+- discussed management with dr. *** (***): ***
+risk: {[high] decision regarding hospitalization: ***/[high] decision regarding escalation of care: ***/[high] decision regarding dnr or de-escalation due to poor prognosis: ***/[high] parenteral controlled substance: ***/[high] drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[mod] prescription drug management: ***/[mod] diagnosis or treatment significantly limited by social determinants of health: ***}">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCMDM" data-key=".JMCMDM"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCMDM</code><span class="ds">Medical decision making</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">MEDICAL DECISION MAKING
+Problem: {[HIGH] *** is a threat to life or organ function without treatment/[HIGH] *** is a severe flare of chronic ***/[MOD] *** chronic illness worsening or with treatment side effect/[MOD] 2+ chronic illnesses managed today: ***/[MOD] new undiagnosed problem with uncertain prognosis: ***/[MOD] acute illness with systemic symptoms: ***/[LOW] stable or uncomplicated illness requiring hospital care: ***}
+Data:
+- Tests reviewed or ordered today: ***
+- Outside records reviewed: ***
+- History from *** because patient ***
+- My own interpretation of ***: ***
+- Discussed management with Dr. *** (***): ***
+Risk: {[HIGH] Decision regarding hospitalization: ***/[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}</pre>
+</article>
+<article class="ph" data-name=".JMCTIME" data-search=".jmctime time statement (only when the minutes are true; required for discharge over 30 min, critical care, and advance care planning) i spent *** minutes on the date of service in the care of this patient, including chart review, examination, documentation, and coordination with the care team, excluding separately billed procedures and teaching time.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCTIME" data-key=".JMCTIME"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCTIME</code><span class="ds">Time statement (only when the minutes are true; required for discharge over 30 min, critical care, and advance care planning)</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">I spent *** minutes on the date of service in the care of this patient, including chart review, examination, documentation, and coordination with the care team, excluding separately billed procedures and teaching time.</pre>
+</article></section>
+<section class="grp"><h2>Assessment and plan blocks <span class="ct">11</span></h2>
+<article class="ph" data-name=".JMCSEPSIS" data-search=".jmcsepsis  #sepsis {without organ dysfunction/with *** (acute organ dysfunction)/septic shock} due to *** (organism ***), {improving/worsening/unchanged}
+tmax *** ; lactate *** to *** ; wbc *** to *** ; cultures: ***
+- antibiotics: *** (day *** of ***, stop ***); narrow to *** per cultures
+- source control: ***
+- pressors: {none/norepinephrine *** mcg/min, map goal 65}
+- endpoint: afebrile 48 h, hemodynamically stable, po transition to ***
+sep-1 (day 1): lactate ***, bcx before abx at ***, abx at ***, fluids *** ml/kg {(30 ml/kg)/(less than 30 ml/kg due to ***)}, reassessment at ***">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSEPSIS" data-key=".JMCSEPSIS"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSEPSIS</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#Sepsis {without organ dysfunction/with *** (acute organ dysfunction)/septic shock} due to *** (organism ***), {improving/worsening/unchanged}
+Tmax *** ; lactate *** to *** ; WBC *** to *** ; cultures: ***
+- Antibiotics: *** (day *** of ***, stop ***); narrow to *** per cultures
+- Source control: ***
+- Pressors: {none/norepinephrine *** mcg/min, MAP goal 65}
+- Endpoint: afebrile 48 h, hemodynamically stable, PO transition to ***
+SEP-1 (day 1): lactate ***, BCx before abx at ***, abx at ***, fluids *** mL/kg {(30 mL/kg)/(less than 30 mL/kg due to ***)}, reassessment at ***</pre>
+</article>
+<article class="ph" data-name=".JMCAHRF" data-search=".jmcahrf  #acute {hypoxic/hypercapnic/hypoxic and hypercapnic} respiratory failure due to ***, {improving/worsening/unchanged}
+{spo2 *** on ***/p:f ***/ph *** paco2 ***}; rr ***; work of breathing ***
+- ***
+- wean o2 to spo2 {92 to 96%/88 to 92% (hypercapnia)}
+- endpoint: room air or home o2 *** l at rest and ambulation">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCAHRF" data-key=".JMCAHRF"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCAHRF</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#Acute {hypoxic/hypercapnic/hypoxic and hypercapnic} respiratory failure due to ***, {improving/worsening/unchanged}
+{SpO2 *** on ***/P:F ***/pH *** PaCO2 ***}; RR ***; work of breathing ***
+- ***
+- Wean O2 to SpO2 {92 to 96%/88 to 92% (hypercapnia)}
+- Endpoint: room air or home O2 *** L at rest and ambulation</pre>
+</article>
+<article class="ph" data-name=".JMCHF" data-search=".jmchf  #acute on chronic {hfref (ef ***%)/hfpef (ef ***%)/hfmref}, nyha ***, {improving/worsening/unchanged}
+weight *** to *** kg (dry ~***), net ***; jvp ***; edema ***. trigger: ***
+- {furosemide/bumetanide} *** iv ***, goal net -*** l/day; bmp/mg daily
+- gdmt: bb ***; arni/acei/arb ***; mra ***; sglt2i ***
+- endpoint: euvolemic on po diuretic x24 h; hf follow-up within 7 days">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCHF" data-key=".JMCHF"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCHF</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#Acute on chronic {HFrEF (EF ***%)/HFpEF (EF ***%)/HFmrEF}, NYHA ***, {improving/worsening/unchanged}
+Weight *** to *** kg (dry ~***), net ***; JVP ***; edema ***. Trigger: ***
+- {Furosemide/bumetanide} *** IV ***, goal net -*** L/day; BMP/Mg daily
+- GDMT: BB ***; ARNI/ACEi/ARB ***; MRA ***; SGLT2i ***
+- Endpoint: euvolemic on PO diuretic x24 h; HF follow-up within 7 days</pre>
+</article>
+<article class="ph" data-name=".JMCAKI" data-search=".jmcaki  #aki, kdigo stage ***, {prerenal/atn/obstructive/***} from ***, {improving/worsening/unchanged}
+cr baseline *** to peak *** to today ***; uop *** ml/kg/h; {fena/feurea} ***
+- ***
+- hold ***; renally dose meds (reviewed); avoid nsaids and contrast
+- endpoint: cr at or near baseline; resume *** then">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCAKI" data-key=".JMCAKI"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCAKI</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#AKI, KDIGO stage ***, {prerenal/ATN/obstructive/***} from ***, {improving/worsening/unchanged}
+Cr baseline *** to peak *** to today ***; UOP *** mL/kg/h; {FENa/FEUrea} ***
+- ***
+- Hold ***; renally dose meds (reviewed); avoid NSAIDs and contrast
+- Endpoint: Cr at or near baseline; resume *** then</pre>
+</article>
+<article class="ph" data-name=".JMCTROP" data-search=".jmctrop  #{type 1 nstemi/type 2 mi due to ***/acute non-ischemic myocardial injury/chronic non-ischemic myocardial injury}, {improving/resolved}
+hs-troponin *** to *** to *** ng/l; ecg (my read): ***; tte: ***
+{favor *** over *** given ***.}
+- ***">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCTROP" data-key=".JMCTROP"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCTROP</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#{Type 1 NSTEMI/Type 2 MI due to ***/Acute non-ischemic myocardial injury/Chronic non-ischemic myocardial injury}, {improving/resolved}
+hs-troponin *** to *** to *** ng/L; ECG (my read): ***; TTE: ***
+{Favor *** over *** given ***.}
+- ***</pre>
+</article>
+<article class="ph" data-name=".JMCENCEPH" data-search=".jmcenceph  #acute {metabolic/toxic/toxic-metabolic} encephalopathy due to ***, {improving/worsening/unchanged}
+cam {+/-}; baseline per *** is ***
+- treat cause: ***; stop or avoid ***
+- delirium bundle: sleep, glasses/hearing aids, mobilize, family at bedside
+- endpoint: back to baseline per ***">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCENCEPH" data-key=".JMCENCEPH"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCENCEPH</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#Acute {metabolic/toxic/toxic-metabolic} encephalopathy due to ***, {improving/worsening/unchanged}
+CAM {+/-}; baseline per *** is ***
+- Treat cause: ***; stop or avoid ***
+- Delirium bundle: sleep, glasses/hearing aids, mobilize, family at bedside
+- Endpoint: back to baseline per ***</pre>
+</article>
+<article class="ph" data-name=".JMCNA" data-search=".jmcna  #hyponatremia, {hypovolemic/euvolemic (siadh from ***)/hypervolemic}, {acute/chronic}, {improving/worsening}
+na *** to *** ; sosm *** ; uosm *** ; una ***
+- ***
+- correction limit 8 meq/l per 24 h; na q*** h; ddavp clamp if overcorrecting
+- endpoint: na above *** and stable on discharge regimen">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCNA" data-key=".JMCNA"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCNA</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#Hyponatremia, {hypovolemic/euvolemic (SIADH from ***)/hypervolemic}, {acute/chronic}, {improving/worsening}
+Na *** to *** ; Sosm *** ; Uosm *** ; UNa ***
+- ***
+- Correction limit 8 mEq/L per 24 h; Na q*** h; DDAVP clamp if overcorrecting
+- Endpoint: Na above *** and stable on discharge regimen</pre>
+</article>
+<article class="ph" data-name=".JMCAWS" data-search=".jmcaws  #alcohol withdrawal, {mild/moderate/severe}, last drink ***, {seizure/dt history/no complicated history}, {improving/worsening}
+ciwa max *** ; ***
+- {phenobarbital/symptom-triggered lorazepam} ***
+- thiamine *** before glucose; mg/phos repletion
+- addiction medicine {consulted/declined}; discuss naltrexone or acamprosate at discharge">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCAWS" data-key=".JMCAWS"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCAWS</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#Alcohol withdrawal, {mild/moderate/severe}, last drink ***, {seizure/DT history/no complicated history}, {improving/worsening}
+CIWA max *** ; ***
+- {Phenobarbital/symptom-triggered lorazepam} ***
+- Thiamine *** before glucose; Mg/Phos repletion
+- Addiction medicine {consulted/declined}; discuss naltrexone or acamprosate at discharge</pre>
+</article>
+<article class="ph" data-name=".JMCGIB" data-search=".jmcgib  #{upper/lower} gi bleed {from ***/source unknown}, {improving/worsening/unchanged}
+hgb *** to *** ; glasgow-blatchford *** ; hemodynamics ***
+- transfuse for hgb below {7/8 (acs)}; type and screen active
+- {pantoprazole 40 mg iv bid/***}; gi: ***
+- antithrombotics: hold ***, plan to resume ***
+- endpoint: hgb stable x24 h, tolerating diet">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCGIB" data-key=".JMCGIB"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCGIB</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">#{Upper/Lower} GI bleed {from ***/source unknown}, {improving/worsening/unchanged}
+Hgb *** to *** ; Glasgow-Blatchford *** ; hemodynamics ***
+- Transfuse for Hgb below {7/8 (ACS)}; type and screen active
+- {Pantoprazole 40 mg IV BID/***}; GI: ***
+- Antithrombotics: hold ***, plan to resume ***
+- Endpoint: Hgb stable x24 h, tolerating diet</pre>
+</article>
+<article class="ph" data-name=".JMCCHRONIC" data-search=".jmcchronic  chronic, stable: ***">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCCHRONIC" data-key=".JMCCHRONIC"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCCHRONIC</code></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Chronic, stable: ***</pre>
+</article>
+<article class="ph" data-name=".JMCDCCOURSE" data-search=".jmcdccourse discharge summary, one paragraph per problem ***: admitted with ***. treated with ***. course notable for ***. at discharge: ***. follow-up needs to: ***.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCDCCOURSE" data-key=".JMCDCCOURSE"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCDCCOURSE</code><span class="ds">discharge summary, one paragraph per problem</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">***: Admitted with ***. Treated with ***. Course notable for ***. At discharge: ***. Follow-up needs to: ***.</pre>
+</article></section>
+<section class="grp"><h2>Night and ICU notes <span class="ct">3</span></h2>
+<article class="ph" data-name=".JMCEVENT" data-search=".jmcevent cross-cover / event note cross-cover event note
+called by *** at *** for ***.
+background (chart and handoff): ***
+bedside assessment: vitals @vs@; exam ***
+data reviewed: ***
+impression: ***
+actions: ***
+contingency: if ***, then ***.
+primary team to follow up: ***">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCEVENT" data-key=".JMCEVENT"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCEVENT</code><span class="ds">Cross-cover / event note</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">CROSS-COVER EVENT NOTE
+Called by *** at *** for ***.
+Background (chart and handoff): ***
+Bedside assessment: vitals @VS@; exam ***
+Data reviewed: ***
+Impression: ***
+Actions: ***
+Contingency: if ***, then ***.
+Primary team to follow up: ***</pre>
+</article>
+<article class="ph" data-name=".JMCCC" data-search=".jmccc critical care (solo) critical care
+the patient is critically ill with *** (organ failure), with high probability of imminent or life-threatening deterioration.
+interventions: *** (for example vasopressor titration, ventilator management, abg and hemodynamic interpretation, family discussion of goals).
+total critical care time: *** minutes, exclusive of separately billable procedures and teaching time.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCCC" data-key=".JMCCC"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCCC</code><span class="ds">Critical care (solo)</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">CRITICAL CARE
+The patient is critically ill with *** (organ failure), with high probability of imminent or life-threatening deterioration.
+Interventions: *** (for example vasopressor titration, ventilator management, ABG and hemodynamic interpretation, family discussion of goals).
+Total critical care time: *** minutes, exclusive of separately billable procedures and teaching time.</pre>
+</article>
+<article class="ph" data-name=".JMCACP" data-search=".jmcacp advance care planning advance care planning
+participants: ***  (patient {has/lacks} capacity)
+discussed: diagnosis and prognosis, values and goals, code status, ***
+outcome: code status ***; polst {completed/not completed}; surrogate ***
+time spent in advance care planning (voluntary, face to face, separate from other e/m time): *** minutes.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCACP" data-key=".JMCACP"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCACP</code><span class="ds">Advance care planning</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">ADVANCE CARE PLANNING
+Participants: ***  (patient {has/lacks} capacity)
+Discussed: diagnosis and prognosis, values and goals, code status, ***
+Outcome: code status ***; POLST {completed/not completed}; surrogate ***
+Time spent in advance care planning (voluntary, face to face, separate from other E/M time): *** minutes.</pre>
+</article></section>
+<section class="grp"><h2>Secure Chat phrases <span class="ct">10</span></h2>
+<article class="ph" data-name=".JMCSCACK" data-search=".jmcscack acknowledge got it, thanks. coming to bedside in *** min. please {get a full set of vitals/check a poc glucose/get an ecg} before i arrive.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCACK" data-key=".JMCSCACK"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCACK</code><span class="ds">Acknowledge</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Got it, thanks. Coming to bedside in *** min. Please {get a full set of vitals/check a POC glucose/get an ECG} before I arrive.</pre>
+</article>
+<article class="ph" data-name=".JMCSCORDER" data-search=".jmcscorder order placed thanks. ordered ***. please let me know if ***.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCORDER" data-key=".JMCSCORDER"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCORDER</code><span class="ds">Order placed</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Thanks. Ordered ***. Please let me know if ***.</pre>
+</article>
+<article class="ph" data-name=".JMCSCPARAM" data-search=".jmcscparam call parameters plan for tonight: ***. please call me if sbp below *** or above ***, hr above ***, spo2 below *** on ***, rr above ***, uop below *** ml over *** h, new confusion, or you&#x27;re worried.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCPARAM" data-key=".JMCSCPARAM"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCPARAM</code><span class="ds">Call parameters</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Plan for tonight: ***. Please call me if SBP below *** or above ***, HR above ***, SpO2 below *** on ***, RR above ***, UOP below *** mL over *** h, new confusion, or you&#x27;re worried.</pre>
+</article>
+<article class="ph" data-name=".JMCSCPRN" data-search=".jmcscprn prn clarification *** prn ordered for ***. if not effective after ***, please page me before giving a second dose.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCPRN" data-key=".JMCSCPRN"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCPRN</code><span class="ds">PRN clarification</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">*** PRN ordered for ***. If not effective after ***, please page me before giving a second dose.</pre>
+</article>
+<article class="ph" data-name=".JMCSCFOLEY" data-search=".jmcscfoley foley removal foley no longer indicated. please remove and bladder scan q6h; straight cath if pvr above *** ml. let me know if the patient can&#x27;t void by ***.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCFOLEY" data-key=".JMCSCFOLEY"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCFOLEY</code><span class="ds">Foley removal</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Foley no longer indicated. Please remove and bladder scan q6h; straight cath if PVR above *** mL. Let me know if the patient can&#x27;t void by ***.</pre>
+</article>
+<article class="ph" data-name=".JMCSCGOALS" data-search=".jmcscgoals family update request family would like an update. i&#x27;m planning to call *** at ***. if they arrive before then, please page me and i&#x27;ll come to the bedside.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCGOALS" data-key=".JMCSCGOALS"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCGOALS</code><span class="ds">Family update request</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Family would like an update. I&#x27;m planning to call *** at ***. If they arrive before then, please page me and I&#x27;ll come to the bedside.</pre>
+</article>
+<article class="ph" data-name=".JMCSCDISPO" data-search=".jmcscdispo case management, morning good morning, i&#x27;m covering *** today. likely discharge candidates: ***. potential barriers: ***. anything you need from me early?">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCDISPO" data-key=".JMCSCDISPO"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCDISPO</code><span class="ds">Case management, morning</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Good morning, I&#x27;m covering *** today. Likely discharge candidates: ***. Potential barriers: ***. Anything you need from me early?</pre>
+</article>
+<article class="ph" data-name=".JMCSCPRIOR" data-search=".jmcscprior prior attending, quick clarification hi, i&#x27;m covering *** today. quick question so i don&#x27;t miss anything: what&#x27;s your main concern and what&#x27;s the endpoint for ***? thanks!">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCPRIOR" data-key=".JMCSCPRIOR"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCPRIOR</code><span class="ds">Prior attending, quick clarification</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Hi, I&#x27;m covering *** today. Quick question so I don&#x27;t miss anything: what&#x27;s your main concern and what&#x27;s the endpoint for ***? Thanks!</pre>
+</article>
+<article class="ph" data-name=".JMCSCNOTHING" data-search=".jmcscnothing reviewed, no change thanks for letting me know. reviewed: ***. no change in plan tonight. please call if ***.">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCNOTHING" data-key=".JMCSCNOTHING"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCNOTHING</code><span class="ds">Reviewed, no change</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Thanks for letting me know. Reviewed: ***. No change in plan tonight. Please call if ***.</pre>
+</article>
+<article class="ph" data-name=".JMCSCPAGEFORMAT" data-search=".jmcscpageformat for charge nurse (helps pages arrive with what you need) hi, to help me respond faster overnight, pages are most useful with: patient name and room, current vitals, the concern, and what you need (order, bedside eval, fyi). thank you!">
+  <header class="ph-h">
+    <label class="done"><input type="checkbox" id="done-JMCSCPAGEFORMAT" data-key=".JMCSCPAGEFORMAT"><span class="sr">Loaded in Epic</span></label>
+    <div class="ph-id"><code class="nm">.JMCSCPAGEFORMAT</code><span class="ds">For charge nurse (helps pages arrive with what you need)</span></div>
+    <div class="acts"><button type="button" class="b ghost" data-copy="name">Copy name</button><button type="button" class="b" data-copy="text">Copy text</button></div>
+  </header>
+  <pre class="tx">Hi, to help me respond faster overnight, pages are most useful with: patient name and room, current vitals, the concern, and what you need (order, bedside eval, FYI). Thank you!</pre>
+</article></section>
+  <p class="empty" id="none" hidden>No phrases match that search.</p>
+  <p class="foot">For education. Confirm billing language with UCI coding and compliance.</p>
+</div>
+<script>
+(function(){
+  var KEY="jmc-phrases-loaded", saved={};
+  try{saved=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){saved={}}
+  var boxes=[].slice.call(document.querySelectorAll(".done input")), total=boxes.length;
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}}
+  function prog(){var n=boxes.filter(function(b){return b.checked}).length;
+    document.getElementById("pc").textContent=n+" of "+total+" loaded";
+    document.getElementById("mi").style.width=(total?100*n/total:0)+"%"}
+  boxes.forEach(function(b){var k=b.dataset.key; b.checked=!!saved[k];
+    b.closest(".ph").classList.toggle("is-done",b.checked);
+    b.addEventListener("change",function(){saved[k]=b.checked;b.closest(".ph").classList.toggle("is-done",b.checked);save();prog()})});
+  prog();
+  function selectText(el){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r)}
+  document.addEventListener("click",function(e){var btn=e.target.closest("[data-copy]"); if(!btn)return;
+    var card=btn.closest(".ph"), isName=btn.dataset.copy==="name";
+    var val=isName?card.dataset.name.slice(1):card.querySelector(".tx").textContent;
+    var label=btn.textContent;
+    function ok(){btn.classList.add("copied");btn.textContent="Copied";setTimeout(function(){btn.classList.remove("copied");btn.textContent=label},1400)}
+    function fail(){selectText(isName?card.querySelector(".nm"):card.querySelector(".tx"));btn.textContent="Selected, press Ctrl+C";setTimeout(function(){btn.textContent=label},2200)}
+    try{navigator.clipboard.writeText(val).then(ok,fail)}catch(err){fail()}});
+  var q=document.getElementById("q"), cards=[].slice.call(document.querySelectorAll(".ph"));
+  q.addEventListener("input",function(){var t=q.value.trim().toLowerCase(), any=false;
+    cards.forEach(function(c){var m=!t||c.dataset.search.indexOf(t)>-1;c.hidden=!m;if(m)any=true});
+    document.querySelectorAll(".grp").forEach(function(g){g.hidden=!g.querySelector(".ph:not([hidden])")});
+    document.getElementById("none").hidden=any});
+})();
+</script>
