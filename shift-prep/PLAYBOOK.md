@@ -42,27 +42,50 @@ Set the filter, then save it (star / "Save Filter"):
 One screen, 72-hour trend: vitals, I/O, O2 device and FiO2, BMP, CBC, Mg/Phos, lactate, troponin, BNP, POC glucose, INR, cultures. ICU version adds vent settings, ABG, pressors, sedation.
 
 ### 4. Personal dot phrases
-Load `SMARTPHRASES.md`. Before building any, open SmartPhrase Manager and search the department's existing phrases (search by author of a full-time hospitalist you like, or keywords like "sepsis", "attest", "secure chat"). Copy and personalize instead of starting from scratch.
+Load `SMARTPHRASES.md`, and write A/Ps per `AP-STYLE.md`. Before building any, open SmartPhrase Manager and search the department's existing phrases (search by author of a full-time hospitalist you like, or keywords like "sepsis", "attest", "secure chat"). Copy and personalize instead of starting from scratch.
 
 ## Your shift types
 
-### A. Day shift: rounding, no admissions, inherit overnight resident admissions
-**First 15 minutes:** read the handoff for every patient, scan list columns, sort into **Sick / Going home / Stable**. See sick first, then discharges (aim for the discharge order before noon), then stable.
+### A. Day shift: 12 new-to-you patients plus about 5 overnight admissions
 
-**Overnight resident admissions (new to you):**
-1. Read the resident H&P A/P, then the ED provider note.
-2. Check the quality items residents often leave open: code status discussed, med rec done, VTE prophylaxis ordered, inpatient vs observation status, Foley or line justified, sepsis bundle timing documented.
-3. Confirm or change the plan at the bedside. Then write your attestation (`.JCATTHP`). The resident's H&P plus your attestation is how an initial visit (99221 to 99223) gets billed in a teaching setting.
+This is the hardest shift because nothing is familiar. The fix is **tiered review depth** plus **reviewing into the note**: you write the A/P as you read, so chart review and documentation happen once, not twice.
 
-**Established patients, the 5-minute review (same order every time):**
-| Step | Where | Looking for | Time |
+**Time-boxed plan for a 17-patient day**
+
+| Time | Task |
+|---|---|
+| 0700 to 0715 | Sign-out from the nocturnist. Ask three questions: who's sickest, who could go home today, what's pending. |
+| 0715 to 0730 | List triage (columns sorted by Deterioration Index, then EDD). Tag each patient: **Sick / Going home / New admit / Stable**. Secure Chat case management with likely discharges (`.SCDISPO`). |
+| 0730 to 0900 | Review into the note (tiers below). Place consult orders and call consultants for new admits **now**, so consults happen today. |
+| 0900 to 1130 | Bedside: Sick, then Going home (discharge orders by 1100), then New admits (use Abridge here), then Stable. About 8 min each. |
+| 1130 to 1300 | Consultant and family calls; discharge summaries. |
+| 1300 to 1600 | Finish notes (already about 70% written), afternoon recheck of Sick, update EDDs and handoff. |
+
+**Tiered review depth (about 85 min total for 17 patients)**
+
+| Tier | Who | Depth | Time each |
 |---|---|---|---|
-| 1 | Last progress note, A/P only | Active problems, plan, pending items | 60 s |
-| 2 | "MD notes 48h" filter | Consultant recs, overnight events | 60 s |
-| 3 | Synopsis | Trends, new micro and imaging | 60 s |
-| 4 | MAR | Antibiotic day and stop date, anticoagulation, insulin, PRN opioids, held meds | 45 s |
-| 5 | Orders + LDAs | Foley, line, tele, diet, VTE prophylaxis, code status | 30 s |
-| 6 | "Dispo" filter | PT/OT, placement barriers, expected discharge date | 15 s |
+| 1 | Going home and stable long-stayers | Last progress note A/P, Synopsis, MAR, Dispo filter | 3 min |
+| 2 | Sick established patients | Full 6-step review below | 5 min |
+| 3 | Overnight admissions | H&P A/P, ED note, overnight results, quality gap check | 7 min |
+
+**Review into the note:** open your progress note (department template), copy forward the last A/P (or the H&P A/P for new admits), then edit each problem line by line as you check the chart. Rewrite each problem title to the specific diagnosis, add a trajectory word, and delete what you can't verify (see `AP-STYLE.md`). After the bedside visit, you only add the exam and any changes.
+
+**The 6-step review (same order every time):**
+| Step | Where | Looking for |
+|---|---|---|
+| 1 | Last progress note, A/P only | Active problems, plan, pending items |
+| 2 | "MD notes 48h" filter | Consultant recs, overnight events |
+| 3 | Synopsis | Trends, new micro and imaging |
+| 4 | MAR | Antibiotic day and stop date, anticoagulation, insulin, PRN opioids, held meds |
+| 5 | Orders + LDAs | Foley, line, tele, diet, VTE prophylaxis, code status |
+| 6 | "Dispo" filter | PT/OT, placement barriers, EDD |
+
+**Overnight admissions quality gap check** (residents often leave these open): code status discussed, med rec done, VTE prophylaxis ordered, inpatient vs observation status correct, Foley or line justified, sepsis bundle timing documented.
+
+**Billing note:** if the nocturnist already attested the resident H&P, the initial visit (99221 to 99223) is theirs. Your first-day visit is a subsequent visit (99231 to 99233), and day 1 often meets high MDM (99233): new plan, consultant discussion, independent interpretation, IV drug monitoring. If the H&P is still unattested and you are the admitting attending, attest it (department attestation plus `.JCATTKEY`).
+
+**The first-day tax:** writing a 3-line `.JCCOURSE` for each of 12 new patients adds about 15 minutes on day 1. If you work the next day (or the next attending does), it saves 30+ minutes.
 
 ### B. Night shift with an APP (admissions and cross-cover)
 - **At sign-in, agree on division of labor out loud:** who takes which admissions (for example alternating, or you take the sicker or ICU-bound ones), who takes cross-cover pages, and when you check in (for example 2300 and 0300).
@@ -73,7 +96,7 @@ Load `SMARTPHRASES.md`. Before building any, open SmartPhrase Manager and search
 ### C. Night ICU with two IM residents (teaching)
 - **Huddle at sign-in:** illness severity for each patient (I-PASS), who's on the edge, which resident covers which beds, your call thresholds ("call me for any new pressor, intubation, MAP under 65 for 15 min, rapid response, family asking for goals of care").
 - **Your review:** spend your 5 minutes per patient on the sickest third. For the rest, rely on the resident handoff and spot-check the Synopsis.
-- **Documentation:** residents write; you attest. Critical care time counts **only your own time** (not time teaching, not resident time without you). Use `.JCATTCC`.
+- **Documentation:** residents write; you attest. Critical care time counts **only your own time** (not time teaching, not resident time without you). Use the department attestation plus `.JCATTCCTIME`.
 - **Midnight and 0400 check:** quick list review by Deterioration Index and new results.
 
 ### D. Night ICU solo

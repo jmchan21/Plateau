@@ -44,109 +44,123 @@ I spent *** minutes on the date of service in the care of this patient, includin
 
 ---
 
-## Assessment and plan blocks (common problems, quality items built in)
+## Assessment and plan blocks (format from `AP-STYLE.md`)
+
+Each block: specific diagnosis plus trajectory, evidence as trends, reasoning only if needed, verb-first plan, endpoint. Delete lines that don't apply.
 
 ### `.JCSEPSIS`
 ```
-#Sepsis {without/with acute organ dysfunction: ***/septic shock} due to *** (source: ***)
-- Lactate *** -> *** (repeat at ***). Blood cultures x2 drawn *** prior to antibiotics.
-- Antibiotics: *** started at *** (day ***), narrow per cultures; planned duration ***
-- Fluids: *** mL/kg crystalloid {30 mL/kg given/less given due to *** (volume overload concern, documented)}
-- Reassessment of volume status and perfusion completed at ***: ***
-- Pressors: {none/norepinephrine *** for MAP goal 65}
+#Sepsis {without organ dysfunction/with *** (acute organ dysfunction)/septic shock} due to *** (organism ***), {improving/worsening/unchanged}
+Tmax *** ; lactate *** to *** ; WBC *** to *** ; cultures: ***
+- Antibiotics: *** (day *** of ***, stop ***); narrow to *** per cultures
+- Source control: ***
+- Pressors: {none/norepinephrine *** mcg/min, MAP goal 65}
+- Endpoint: afebrile 48 h, hemodynamically stable, PO transition to ***
+SEP-1 (day 1): lactate ***, BCx before abx at ***, abx at ***, fluids *** mL/kg {/less due to ***}, reassessment at ***
 ```
 
 ### `.JCAHRF`
 ```
-#Acute {hypoxic/hypercapnic/hypoxic and hypercapnic} respiratory failure due to ***
-- Criteria: SpO2 *** on *** / RR *** / work of breathing *** / ABG ***
-- Support: *** (goal SpO2 ***), wean as tolerated
-- Treat cause: ***
+#Acute {hypoxic/hypercapnic/hypoxic and hypercapnic} respiratory failure due to ***, {improving/worsening/unchanged}
+{SpO2 *** on ***/P:F ***/pH *** PaCO2 ***}; RR ***; work of breathing ***
+- ***
+- Wean O2 to SpO2 {92 to 96%/88 to 92% (hypercapnia)}
+- Endpoint: room air or home O2 *** L at rest and ambulation
 ```
 
 ### `.JCHF`
 ```
-#Acute on chronic {systolic (HFrEF, EF ***%)/diastolic (HFpEF)/combined} heart failure, NYHA ***
-- Trigger: ***
-- Diuresis: *** with goal net negative *** L/day; daily weights, strict I/O, BMP/Mg daily
-- GDMT: {beta blocker/ARNI or ACEi/ARB/MRA/SGLT2i} - continue/hold/start ***
-- Discharge: weight ***, follow-up within 7 days, HF education
+#Acute on chronic {HFrEF (EF ***%)/HFpEF (EF ***%)/HFmrEF}, NYHA ***, {improving/worsening/unchanged}
+Weight *** to *** kg (dry ~***), net ***; JVP ***; edema ***. Trigger: ***
+- {Furosemide/bumetanide} *** IV ***, goal net -*** L/day; BMP/Mg daily
+- GDMT: BB ***; ARNI/ACEi/ARB ***; MRA ***; SGLT2i ***
+- Endpoint: euvolemic on PO diuretic x24 h; HF follow-up within 7 days
 ```
 
 ### `.JCAKI`
 ```
-#AKI, KDIGO stage *** (Cr *** from baseline ***), likely {prerenal/ATN/obstructive/***}
-- UOP ***, UA/urine lytes ***, bladder scan ***
-- Avoid nephrotoxins; renally dose meds (reviewed); hold ***
+#AKI, KDIGO stage ***, {prerenal/ATN/obstructive/***} from ***, {improving/worsening/unchanged}
+Cr baseline *** to peak *** to today ***; UOP *** mL/kg/h; {FENa/FEUrea} ***
+- ***
+- Hold ***; renally dose meds (reviewed); avoid NSAIDs and contrast
+- Endpoint: Cr at or near baseline; resume *** then
 ```
 
 ### `.JCTROP`
 ```
-#{Type 1 NSTEMI/Type 2 MI due to ***/Non-ischemic myocardial injury (acute/chronic)} (Fourth Universal Definition)
-- hs-troponin *** -> *** ; ECG: my interpretation ***
-- Plan: ***
+#{Type 1 NSTEMI/Type 2 MI due to ***/Non-ischemic myocardial injury, {acute/chronic}}, {improving/resolved}
+hs-troponin *** to *** to *** ng/L; ECG (my read): ***; TTE: ***
+{Favor *** over *** given ***.}
+- ***
 ```
 
 ### `.JCENCEPH`
 ```
-#Acute {metabolic/toxic} encephalopathy due to ***
-- Delirium precautions, sleep hygiene, avoid deliriogenic meds (reviewed: ***), CAM ***
+#Acute {metabolic/toxic/toxic-metabolic} encephalopathy due to ***, {improving/worsening/unchanged}
+CAM {+/-}; baseline per *** is ***
+- Treat cause: ***; stop or avoid ***
+- Delirium bundle: sleep, glasses/hearing aids, mobilize, family at bedside
+- Endpoint: back to baseline per ***
 ```
 
 ### `.JCNA`
 ```
-#Hyponatremia, {hypotonic hypovolemic/euvolemic (SIADH)/hypervolemic}, Na ***
-- Serum osm ***, urine osm ***, urine Na ***
-- Correction limit: no more than 8 mEq/L in 24 h; Na q*** h
+#Hyponatremia, {hypovolemic/euvolemic (SIADH from ***)/hypervolemic}, {acute/chronic}, {improving/worsening}
+Na *** to *** ; Sosm *** ; Uosm *** ; UNa ***
+- ***
+- Correction limit 8 mEq/L per 24 h; Na q*** h; DDAVP clamp if overcorrecting
+- Endpoint: Na above *** and stable on discharge regimen
 ```
 
 ### `.JCAWS`
 ```
-#Alcohol withdrawal (last drink ***, history of {seizures/DTs/none}), CIWA ***
-- Symptom-triggered ***, thiamine before glucose, folate, MVI, Mg/Phos repletion
-- Counseling offered; addiction medicine consult {placed/declined}
+#Alcohol withdrawal, {mild/moderate/severe}, last drink ***, {seizure/DT history/no complicated history}, {improving/worsening}
+CIWA max *** ; ***
+- {Phenobarbital/symptom-triggered lorazepam} ***
+- Thiamine *** before glucose; Mg/Phos repletion
+- Addiction medicine {consulted/declined}; discuss naltrexone or acamprosate at discharge
 ```
 
 ### `.JCGIB`
 ```
-#{Upper/Lower} GI bleed, Hgb *** -> *** , Glasgow-Blatchford ***
-- 2 large-bore IVs, type and screen, transfuse for Hgb below 7 (8 if ACS)
-- IV PPI ***, GI consulted ***, hold anticoagulation/antiplatelets ***
+#{Upper/Lower} GI bleed {from ***/source unknown}, {improving/worsening/unchanged}
+Hgb *** to *** ; Glasgow-Blatchford *** ; hemodynamics ***
+- Transfuse for Hgb below {7/8 (ACS)}; type and screen active
+- {Pantoprazole 40 mg IV BID/***}; GI: ***
+- Antithrombotics: hold ***, plan to resume ***
+- Endpoint: Hgb stable x24 h, tolerating diet
+```
+
+### `.JCCHRONIC`
+```
+Chronic, stable: ***
+```
+
+### `.JCDCCOURSE`: discharge summary, one paragraph per problem
+```
+**{Principal diagnosis}:** Admitted with ***. Treated with ***. Course notable for ***. At discharge: ***. **Follow-up needs to:** ***.
 ```
 
 ---
 
-## Attestations (resident and APP shifts)
+## Attestation add-in lines (paste inside the department attestation)
 
-### `.JCATTHP`: Resident admission H&P
+You already use the department attestations for residents, APPs, and procedures. These lines make them specific, since "seen and agree" alone does not support the billed level.
+
+### `.JCATTKEY`: What you personally did
 ```
-TEACHING PHYSICIAN ATTESTATION
-I saw and evaluated the patient on @TODAY@, and discussed the case with Dr. *** (resident). I reviewed the resident's note and agree with the findings and plan as documented, with the following additions or changes: ***.
-Key findings on my exam: ***.
-My assessment: ***.
-I personally reviewed: ***.
+My key findings: ***. I personally reviewed {CXR/CT/ECG} images: ***. My assessment differs from or adds to the resident's as follows: ***. Today's key decisions: ***.
 ```
 
-### `.JCATTPN`: Resident progress note
+### `.JCATTCCTIME`: Critical care time (residents present)
 ```
-TEACHING PHYSICIAN ATTESTATION
-I saw and examined the patient today and discussed with the resident. I agree with the resident's assessment and plan with the following changes: ***. Key decisions made today: ***.
-```
-
-### `.JCATTCC`: Critical care with residents
-```
-TEACHING PHYSICIAN CRITICAL CARE ATTESTATION
-The patient is critically ill with *** with high probability of imminent or life-threatening deterioration. I personally evaluated the patient and directed care, including ***.
-My personal critical care time: *** minutes, excluding teaching time, resident time without my presence, and separately billable procedures.
+My personal critical care time: *** minutes, excluding teaching time, resident time without my presence, and separately billable procedures. Critical illness: ***. My interventions: ***.
 ```
 
-### `.JCSPLIT`: Split/shared visit with APP
+### `.JCSPLIT`: Split/shared with APP
 ```
-SPLIT/SHARED VISIT
-This was a split/shared visit with *** (APP). I performed the substantive portion of the visit by {spending more than half of the total time (*** of *** minutes)/making the medical decision-making: ***}.
+I performed the substantive portion of this visit by {spending more than half of total time (*** of *** min)/making the medical decision-making: ***}.
 ```
-
----
 
 ## Night and ICU notes
 
@@ -215,6 +229,11 @@ Foley no longer indicated. Please remove and bladder scan q6h; straight cath if 
 ### `.SCGOALS`: Family update request
 ```
 Family would like an update. I'm planning to call *** at ***. If they arrive before then, please page me and I'll come to the bedside.
+```
+
+### `.SCDISPO`: Case management, morning
+```
+Good morning, I'm covering *** today. Likely discharge candidates: ***. Potential barriers: ***. Anything you need from me early?
 ```
 
 ### `.SCNOTHING`: Reviewed, no change

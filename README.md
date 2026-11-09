@@ -14,4 +14,4 @@ To update: edit `src/index.html`, bump `CONTENT_VERSION` and `REVIEWED`, run `py
 For education only. Not medical advice.
 
 ## Shift Prep (separate tool)
-`shift-prep/`: per diem hospitalist and intensivist workflow for Epic. `PLAYBOOK.md` covers setup, the 5-minute review for each shift type, Abridge, quality measures, and RVU learning. `SMARTPHRASES.md` has add-on A/P blocks, attestations, and Secure Chat phrases.
+`shift-prep/`: per diem hospitalist and intensivist workflow for Epic. `PLAYBOOK.md` covers setup, the 5-minute review for each shift type, Abridge, quality measures, and RVU learning. `SMARTPHRASES.md` has add-on A/P blocks, attestation add-ins, and Secure Chat phrases. `AP-STYLE.md` is the concise, specific A/P style guide.
