@@ -38,7 +38,7 @@ Neither tells the next doctor the source, the organism, the day, the response, o
 5. **Plan bullets start with a verb and include the number.** "Furosemide 80 mg IV BID, goal net negative 1 to 2 L" not "continue diuresis."
 6. **Every plan has an endpoint.** Antibiotic stop date, diuresis target weight, the Hgb that triggers a transfusion, the criteria for discharge.
 7. **No filler phrases.** Delete: "will continue to monitor", "appreciate recs", "patient is a pleasant", "as needed" without a trigger, "will follow" without what you'll do with the result.
-8. **Consultant recs as decisions, not deference.** "Per cardiology: no ischemic evaluation inpatient; outpatient stress test" (and name them in the MDM data line, `.JCDATA`).
+8. **Consultant recs as decisions, not deference.** "Per cardiology: no ischemic evaluation inpatient; outpatient stress test" (and name them in the MDM data line, `.JCMDM`).
 9. **Chronic stable problems: one line each, grouped at the bottom.**
    > Chronic, stable: HTN (amlodipine held for soft BP), T2DM (A1c 7.9, basal-bolus, BG 120s to 180s), HLD (atorvastatin 40), GERD (pantoprazole).
 10. **Resolved problems collapse to one line** under the hospital course, then get deleted after a day.

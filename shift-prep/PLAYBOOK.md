@@ -5,7 +5,7 @@ Goal: understand every patient well enough to be safe in about 5 minutes each, o
 Context this is built for:
 - UC Irvine, academic center, two hospitals on **one Epic system** (set up once, works at both).
 - Paid per shift. RVU content is here so you **learn it for a future practice**, and because the department still tracks attending documentation and wRVUs.
-- Department dot phrases and note templates already exist. Your personal phrases are **add-ons**: A/P blocks, attestations, quality checks, and Secure Chat messages (see `SMARTPHRASES.md`).
+- Department dot phrases and note templates already exist. Your personal phrases are **add-ons**: A/P blocks, an MDM phrase, quality checks, and Secure Chat messages. Attestations: always UCI's approved versions (see `SMARTPHRASES.md`).
 - Abridge is available. You haven't used it yet (see the Abridge section).
 
 ## The reframe
@@ -83,7 +83,7 @@ This is the hardest shift because nothing is familiar. The fix is **tiered revie
 
 **Overnight admissions quality gap check** (residents often leave these open): code status discussed, med rec done, VTE prophylaxis ordered, inpatient vs observation status correct, Foley or line justified, sepsis bundle timing documented.
 
-**Attesting overnight H&Ps (your usual role):** you attest most overnight resident H&Ps, so the initial visit (99221 to 99223) is yours. These are your highest-value notes of the day. Your 7-minute review plus bedside visit is the "personal participation" the attestation must describe. Use the department attestation plus `.JCATTKEY` (your own findings, your image or ECG read, what you changed). Most sepsis, respiratory failure, and new heart failure admissions meet high MDM (99223) when you document it. The date of service is the date you personally see the patient; confirm edge cases (resident admits at 0200, you see at 1000) with UCI coding.
+**Attesting overnight H&Ps (your usual role):** you attest most overnight resident H&Ps, so the initial visit (99221 to 99223) is yours. These are your highest-value notes of the day. Your 7-minute review plus bedside visit is the "personal participation" the attestation must describe. Use UCI's approved attestation, and make sure your note shows your own findings, your image or ECG read, and what you changed. Most sepsis, respiratory failure, and new heart failure admissions meet high MDM (99223) when you document it. The date of service is the date you personally see the patient; confirm edge cases (resident admits at 0200, you see at 1000) with UCI coding.
 **When a night attending already attested:** the initial visit is theirs. Your visit is subsequent care (99231 to 99233), and day 1 often meets high MDM (99233).
 
 **The first-day tax:** writing a 3-line `.JCCOURSE` for each of 12 new patients adds about 15 minutes on day 1. If you work the next day (or the next attending does), it saves 30+ minutes.
@@ -121,7 +121,7 @@ If the story is still unclear after 7 minutes, stop reading. Ask the patient and
 ### C. Night ICU with two IM residents (teaching)
 - **Huddle at sign-in:** illness severity for each patient (I-PASS), who's on the edge, which resident covers which beds, your call thresholds ("call me for any new pressor, intubation, MAP under 65 for 15 min, rapid response, family asking for goals of care").
 - **Your review:** spend your 5 minutes per patient on the sickest third. For the rest, rely on the resident handoff and spot-check the Synopsis.
-- **Documentation:** residents write; you attest. Critical care time counts **only your own time** (not time teaching, not resident time without you). Use the department attestation plus `.JCATTCCTIME`.
+- **Documentation:** residents write; you attest. Critical care time counts **only your own time** (not time teaching, not resident time without you). Use UCI's approved critical care attestation.
 - **Midnight and 0400 check:** quick list review by Deterioration Index and new results.
 
 ### D. Night ICU solo
@@ -187,10 +187,8 @@ Pick the level by **MDM or total same-day time, whichever is higher.**
 
 Notice the spread: a day of 99232s vs 99233s on 16 patients is about 13 wRVUs. Documenting what you already do to the right level is the largest lever.
 
-### High MDM (99223 / 99233): need 2 of 3
-- **Problems:** chronic illness with severe exacerbation, or acute illness posing a threat to life or bodily function.
-- **Data:** 2 of 3 categories: (a) 3 items from unique tests reviewed or ordered, external notes reviewed, independent historian; (b) independent interpretation of a test ("I personally reviewed the CXR images: ..."); (c) discussion of management with an external physician ("Discussed with cardiology, who recommends ...").
-- **Risk:** drug therapy requiring intensive monitoring for toxicity (heparin or insulin drip, vancomycin levels); decision about escalation of hospital-level care; decision about DNR or de-escalation; parenteral controlled substances.
+### MDM: the honest route when your time is short
+See `MDM-GUIDE.md`: a plain-language guide with the 2-of-3 scoring rule, examples, nuances, and the `.JCMDM` phrase. Discharge, critical care, advance care planning, and prolonged services are billed by time only.
 
 ### Teaching physician rules (your resident shifts)
 - For MDM-based billing, the resident documents and you attest that you saw the patient and participated in the key or critical portions, and agree or amend.

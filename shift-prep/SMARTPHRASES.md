@@ -2,7 +2,7 @@
 
 These do not replace the department's note templates. Drop them into the A/P or the end of a note. Loading: Epic > SmartPhrase Manager > New > name it (`.JC...`) > paste. `***` is a wildcard (F2 jumps to the next one). `{a/b/c}` should become a SmartList, or delete the options you don't use. If an `@TOKEN@` doesn't resolve, type `@` in the editor and search for the UCI equivalent.
 
-Before building, search SmartPhrase Manager for existing department versions (keywords: sepsis, attest, critical care, secure chat). Copy and personalize instead of starting from scratch.
+Use UCI's approved department attestations for residents, APPs, and procedures; this library has none. Before building, search SmartPhrase Manager for existing department versions (keywords: sepsis, critical care, secure chat). Copy and personalize instead of starting from scratch.
 
 ---
 
@@ -38,15 +38,20 @@ WAITING FOR: ***
 RISK NEXT 24H: ***
 ```
 
-### `.JCDATA`: MDM data and risk (supports the level you earned)
+### `.JCMDM`: Medical decision making (see `MDM-GUIDE.md` for how to use it)
 ```
-Independent interpretation: I personally reviewed {CXR/CT/ECG/telemetry} images: ***.
-Discussed management with ***, who recommends ***.
-External records reviewed: ***.  Independent historian: ***.
-Risk: {drug therapy requiring intensive monitoring for toxicity: ***/decision regarding escalation of care/decision regarding de-escalation or DNR/parenteral controlled substances}.
+MEDICAL DECISION MAKING
+Problem: {[HIGH] *** is a threat to life or organ function without treatment/[HIGH] *** is a severe flare of chronic ***/[MOD] *** chronic illness worsening or with treatment side effect/[MOD] 2+ chronic illnesses managed today: ***/[MOD] new undiagnosed problem with uncertain prognosis: ***/[MOD] acute illness with systemic symptoms: ***/[LOW] stable or uncomplicated illness requiring hospital care: ***}
+Data:
+- Tests reviewed or ordered today: ***
+- Outside records reviewed: ***
+- History from *** because patient ***
+- My own interpretation of ***: ***
+- Discussed management with Dr. *** (***): ***
+Risk: {[HIGH] Decision regarding escalation of care: ***/[HIGH] Decision regarding DNR or de-escalation due to poor prognosis: ***/[HIGH] Parenteral controlled substance: ***/[HIGH] Drug therapy requiring intensive monitoring for toxicity: *** (monitoring ***)/[MOD] Prescription drug management: ***/[MOD] Diagnosis or treatment significantly limited by social determinants of health: ***}
 ```
 
-### `.JCTIME`: Time statement
+### `.JCTIME`: Time statement (only when the minutes are true; required for discharge over 30 min, critical care, and advance care planning)
 ```
 I spent *** minutes on the date of service in the care of this patient, including chart review, examination, documentation, and coordination with the care team, excluding separately billed procedures and teaching time.
 ```
@@ -151,25 +156,6 @@ Chronic, stable: ***
 ```
 
 ---
-
-## Attestation add-in lines (paste inside the department attestation)
-
-You already use the department attestations for residents, APPs, and procedures. These lines make them specific, since "seen and agree" alone does not support the billed level.
-
-### `.JCATTKEY`: What you personally did
-```
-My key findings: ***. I personally reviewed {CXR/CT/ECG} images: ***. My assessment differs from or adds to the resident's as follows: ***. Today's key decisions: ***.
-```
-
-### `.JCATTCCTIME`: Critical care time (residents present)
-```
-My personal critical care time: *** minutes, excluding teaching time, resident time without my presence, and separately billable procedures. Critical illness: ***. My interventions: ***.
-```
-
-### `.JCSPLIT`: Split/shared with APP
-```
-I performed the substantive portion of this visit by {spending more than half of total time (*** of *** min)/making the medical decision-making: ***}.
-```
 
 ## Night and ICU notes
 
