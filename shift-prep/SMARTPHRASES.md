@@ -29,6 +29,15 @@ EDD: ***  Barriers: ***  Dispo: {home/home health/SNF/IRF/LTACH/hospice}
 ICU BUNDLE: SAT {done/held because ***}, SBT {passed/failed/not eligible because ***}. RASS goal ***, actual ***. CAM-ICU {neg/pos}. Mobility: ***. Family updated: {yes, *** /not yet}. Lines/tubes reviewed for removal: ***.
 ```
 
+### `.JCRECON`: Messy chart reconstruction (Sticky Note, not in the chart)
+```
+WHY HERE: ***
+DONE (dates): ***
+WORKING / NOT: ***
+WAITING FOR: ***
+RISK NEXT 24H: ***
+```
+
 ### `.JCDATA`: MDM data and risk (supports the level you earned)
 ```
 Independent interpretation: I personally reviewed {CXR/CT/ECG/telemetry} images: ***.
@@ -234,6 +243,11 @@ Family would like an update. I'm planning to call *** at ***. If they arrive bef
 ### `.SCDISPO`: Case management, morning
 ```
 Good morning, I'm covering *** today. Likely discharge candidates: ***. Potential barriers: ***. Anything you need from me early?
+```
+
+### `.SCPRIOR`: Prior attending, quick clarification
+```
+Hi, I'm covering *** today. Quick question so I don't miss anything: what's your main concern and what's the endpoint for ***? Thanks!
 ```
 
 ### `.SCNOTHING`: Reviewed, no change

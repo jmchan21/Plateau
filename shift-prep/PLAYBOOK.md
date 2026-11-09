@@ -83,9 +83,34 @@ This is the hardest shift because nothing is familiar. The fix is **tiered revie
 
 **Overnight admissions quality gap check** (residents often leave these open): code status discussed, med rec done, VTE prophylaxis ordered, inpatient vs observation status correct, Foley or line justified, sepsis bundle timing documented.
 
-**Billing note:** if the nocturnist already attested the resident H&P, the initial visit (99221 to 99223) is theirs. Your first-day visit is a subsequent visit (99231 to 99233), and day 1 often meets high MDM (99233): new plan, consultant discussion, independent interpretation, IV drug monitoring. If the H&P is still unattested and you are the admitting attending, attest it (department attestation plus `.JCATTKEY`).
+**Attesting overnight H&Ps (your usual role):** you attest most overnight resident H&Ps, so the initial visit (99221 to 99223) is yours. These are your highest-value notes of the day. Your 7-minute review plus bedside visit is the "personal participation" the attestation must describe. Use the department attestation plus `.JCATTKEY` (your own findings, your image or ECG read, what you changed). Most sepsis, respiratory failure, and new heart failure admissions meet high MDM (99223) when you document it. The date of service is the date you personally see the patient; confirm edge cases (resident admits at 0200, you see at 1000) with UCI coding.
+**When a night attending already attested:** the initial visit is theirs. Your visit is subsequent care (99231 to 99233), and day 1 often meets high MDM (99233).
 
 **The first-day tax:** writing a 3-line `.JCCOURSE` for each of 12 new patients adds about 15 minutes on day 1. If you work the next day (or the next attending does), it saves 30+ minutes.
+
+### Decoding a messy chart (copy-paste notes, no reasoning)
+
+Disorganized notes are common, not a personal failing of one group: in one academic center's analysis of 23,630 inpatient progress notes, 46% of text was copied and 36% imported; only 18% was typed new (Wang, JAMA Intern Med 2017, PMID 28558106). So don't read the notes front to back. **Rebuild the story from primary sources, which can't be copy-pasted:**
+
+| Source | Why it's reliable | What to pull |
+|---|---|---|
+| ED provider note and first H&P | Written fresh, before copy-forward | Why they came in, initial thinking |
+| Consult notes | Usually reasoned and current | The specialist's diagnosis and plan |
+| Orders (include discontinued) and MAR history | Show what doctors **did**, with dates | Antibiotic start/stop, diuretics, drips, procedures, imaging ordered |
+| Synopsis trends | Objective | Is it getting better or worse |
+| Nursing, case management, PT/OT notes | Often the most current narrative | Function, barriers, family dynamics |
+| The nurse at the bedside (30 seconds) | Knows the last 12 hours | "What's changed, what's worrying you?" |
+
+If UCI's Epic has note provenance highlighting (copied vs typed text) or an AI chart summary, use them to skip copied blocks and get a first-pass timeline, then verify against the sources above.
+
+**Fill the 5-question sticky note (`.JCRECON`) as you go, 7 minutes max:**
+1. Why are they here? (one line)
+2. What has been done, with dates?
+3. What is working, what is not?
+4. What are they waiting for?
+5. What could hurt them in the next 24 hours?
+
+If the story is still unclear after 7 minutes, stop reading. Ask the patient and nurse, and Secure Chat or call the prior attending (`.SCPRIOR`). Then turn the sticky note into `.JCCOURSE` and rewrite the A/P in your format. From that day forward the chart is clean, for you and everyone after you.
 
 ### B. Night shift with an APP (admissions and cross-cover)
 - **At sign-in, agree on division of labor out loud:** who takes which admissions (for example alternating, or you take the sicker or ICU-bound ones), who takes cross-cover pages, and when you check in (for example 2300 and 0300).
@@ -122,6 +147,8 @@ How to start, low-risk:
 2. Pilot it on 2 or 3 stable patients on one day shift. Compare the draft with what you'd have written.
 3. Keep your own A/P dot phrases. Let Abridge draft the HPI and subjective, and you write the assessment. The A/P is where your clinical reasoning, MDM, and quality items live.
 4. Always read the draft before signing (check meds, doses, laterality, and anything the patient said that wasn't true).
+
+**Research angle 2 (note quality):** your frustration with disorganized notes is a measurable QI problem. Design: rate a random sample of hospitalist progress notes with the PDQI-9 (a validated 9-item note quality tool; Stetson, Appl Clin Inform 2012, PMC3347480), introduce a standardized A/P format (`AP-STYLE.md`) as a department template, and re-rate after 3 months. Add note length and copied-text percentage if Epic provenance data is available. Fits SHM Converge or a hospital QI symposium.
 
 **Research angle:** "Effect of ambient AI documentation on note time and after-hours charting for nocturnists and per diem hospitalists" is a timely QI or research question. UCI likely has Epic Signal data (time in notes, pajama time). Ask the department's QI lead whether pre/post data on Abridge adoption is available.
 
@@ -188,6 +215,8 @@ Central line (36556) plus ultrasound guidance (76937, needs documentation of ves
 For one shift a week, privately code each of your notes (level and why) in a simple log: date, shift type, code you'd bill, MDM elements present, time. Compare with what the department's coder assigns, if they'll share it. After 4 to 6 weeks you'll code reliably.
 
 ## References
+- Wang MD, Khanna R, Najafi N. Characterizing the source of text in electronic health record progress notes. JAMA Intern Med. 2017;177:1212-1213. PMID 28558106.
+- Stetson PD, et al. Assessing electronic note quality using the Physician Documentation Quality Instrument (PDQI-9). Appl Clin Inform. 2012;3:164-174. PMC3347480.
 - Starmer AJ, et al. Changes in medical errors after implementation of a handoff program (I-PASS). N Engl J Med. 2014;371:1803-1812. doi:10.1056/NEJMsa1405556 (PMID to confirm on PubMed).
 - Wong A, et al. External validation of a widely implemented proprietary sepsis prediction model in hospitalized patients. JAMA Intern Med. 2021;181:1065-1070. PMID 34152373. (Why sepsis alerts are a prompt, not a diagnosis.)
 - Thygesen K, et al. Fourth Universal Definition of Myocardial Infarction (2018). J Am Coll Cardiol. 2018;72:2231-2264. PMID 30153967.
