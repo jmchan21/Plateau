@@ -12,3 +12,6 @@ Mechanical ventilation training for ICU clinicians: ventilator simulator, bedsid
 To update: edit `src/index.html`, bump `CONTENT_VERSION` and `REVIEWED`, run `python3 tools/build.py`, commit, push.
 
 For education only. Not medical advice.
+
+## Shift Prep (separate tool)
+`shift-prep/`: per diem hospitalist and intensivist workflow for Epic. `PLAYBOOK.md` covers the 5-minute chart review, quality measure checklist, and billing/RVU cheat sheet. `SMARTPHRASES.md` has copy-paste note templates.
